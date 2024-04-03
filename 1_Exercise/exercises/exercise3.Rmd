@@ -1,0 +1,104 @@
+## 3. The golden ratio
+
+Two positive numbers $x$ and $y$ with $x>y$ are said to be in the golden ratio if the ratio between the larger number and the smaller number is the same as the ratio between their sum and the larger number:
+
+$$
+\frac{x}{y}=\frac{x+y}{x}
+$$
+
+The golden ratio $\Phi=x / y$ can be computed as a solution to $\Phi^{2}-\Phi-1=0$ and is
+
+$$
+\Phi=\frac{\sqrt{5}+1}{2}
+$$
+
+and it satisfies the Fibonacci-like relationship:
+
+$$
+\Phi^{n+1}=\Phi^{n}+\Phi^{n-1}
+$$
+
+### a.
+
+Write an $\mathrm{R}$ function which computes $\Phi^{n+1}$ using the recursion above (go up to $n=1000$ ) .
+
+```{r e3a1, dev=c('png')}
+
+phi_recursive <- function(n) {
+  phi_0 <- (sqrt(5) - 1) / 2  # This is not used directly but initialized for completeness
+  phi_1 <- (sqrt(5) + 1) / 2  # This is Phi
+  phi_2 <- phi_1 + 1          # This is Phi^2, which equals Phi + 1 due to the quadratic equation
+  
+  # Base cases
+  if (n == 0) {
+    return(phi_1)
+  } else if (n == 1) {
+    return(phi_2)
+  }
+  
+  # Iteratively compute Phi^n+1 for n > 1
+  for (i in 2:n) {
+    # Update the sequence values
+    temp <- phi_2 + phi_1
+    phi_1 <- phi_2
+    phi_2 <- temp
+  }
+  
+  return(phi_2)
+}
+
+testcases <- seq(0,4)
+for (case in testcases) {
+  print(paste("Phi^", case+1, ": ", phi_recursive(case), sep=""))
+}
+print(paste("Phi^1000: ", phi_recursive(999), sep=""))
+
+```
+
+### b.
+
+Write a function which computes this $\Phi^{n+1}$ by simply using the power operator ^.
+
+```{r e3b1, dev=c('png')}
+
+phi_power <- function(n) {
+  return (((sqrt(5) + 1) / 2)^(n+1))
+}
+
+testcases <- seq(0,4)
+for (case in testcases) {
+  print(paste("Phi^", case+1, ": ", phi_power(case), sep=""))
+}
+print(paste("Phi^1000: ", phi_power(999), sep=""))
+
+```
+
+
+### c.
+
+Use once $==$ and once all. equal to compare $\Phi^{n+1}$ obtained in a. vs the one obtained in b. for $n=$ $12,60,120,300$. 
+What do you observe? 
+If there are any differences, what can be the reason?
+
+```{r e3c1, dev=c('png')}
+
+n_values <- c(12, 60, 120, 300)
+comparison_results <- sapply(n_values, function(n) {
+  recursive_computed <- phi_recursive(n)
+  power_computed <- phi_power(n)
+  
+  # Using == for exact comparison (might not always be true due to floating-point precision)
+  exact_match <- recursive_computed == power_computed
+  
+  # Using all.equal for a tolerance-based comparison
+  tolerant_match <- all.equal(recursive_computed, power_computed)
+  
+  list(ExactMatch = exact_match, TolerantMatch = tolerant_match)
+})
+
+print(comparison_results)
+
+```
+As written in the R documentation, the $all.equal$ function uses a tolerance:
+
+"Differences smaller than tolerance are not reported. The default value is close to 1.5e-8"

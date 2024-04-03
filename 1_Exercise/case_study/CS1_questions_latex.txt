@@ -1,0 +1,136 @@
+\title{
+Case Study 1
+}
+
+\section*{AKSTA Statistical Computing}
+
+The .Rmd and .html (alternatively the .pdf) should be uploaded in TUWEL by the deadline. Refrain from using explanatory comments in the $R$ code chunks but write them as text instead. Points will be deducted if the submitted file is not in a decent form.
+
+\section*{1. Ratio of Fibonacci numbers}
+
+a.
+
+Write two different $\mathrm{R}$ functions which return the sequence $r_{i}=F_{i+1} / F_{i}$ for $i=1, \ldots, n$ where $F_{i}$ is the $i$ th Fibonacci number, once using for and once using while.
+
+b.
+
+Benchmark the two functions for $n=200$ and $n=2000$ (you can use package microbenchmark or package bench for this purpose). Which function is faster?
+
+c.
+
+Plot the sequence for $n=100$. For which value $n$ it starts to converge? What is the number that it converges to?
+
+\section*{2. Gamma function}
+
+a.
+
+Write a function to compute the following for $n$ a positive integer using the gamma function in base $\mathrm{R}$.
+
+$$
+\rho_{n}=\frac{\Gamma((n-1) / 2)}{\Gamma(1 / 2) \Gamma((n-2) / 2)}
+$$
+
+b.
+
+Try $n=2000$. What do you observe? Why do you think the observed behavior happens?
+
+c.
+
+Write an implementation which can also deal with large values of $n>1000$.
+
+d.
+
+Plot $\rho_{n} / \sqrt{n}$ for different values of $n$. Can you guess the limit of $\rho_{n} / \sqrt{n}$ for $n \rightarrow \infty$ ?
+
+\section*{3. The golden ratio}
+
+Two positive numbers $x$ and $y$ with $x>y$ are said to be in the golden ratio if the ratio between the larger number and the smaller number is the same as the ratio between their sum and the larger number:
+
+$$
+\frac{x}{y}=\frac{x+y}{x}
+$$
+
+The golden ratio $\Phi=x / y$ can be computed as a solution to $\Phi^{2}-\Phi-1=0$ and is
+
+$$
+\Phi=\frac{\sqrt{5}+1}{2}
+$$
+
+and it satisfies the Fibonacci-like relationship:
+
+$$
+\Phi^{n+1}=\Phi^{n}+\Phi^{n-1}
+$$
+
+a.
+
+Write an $\mathrm{R}$ function which computes $\Phi^{n+1}$ using the recursion above (go up to $n=1000$ ) .
+
+b.
+
+Write a function which computes this $\Phi^{n+1}$ by simply using the power operator ^.
+
+c.
+
+Use once $==$ and once all. equal to compare $\Phi^{n+1}$ obtained in a. vs the one obtained in b. for $n=$ $12,60,120,300$. What do you observe? If there are any differences, what can be the reason?
+
+\section*{4. Game of craps}
+
+A variation of game of craps is played as follows. The player rolls a die and if they roll a 6 , they immediately wins. If a 1 is rolled, they immediately loses. If a $2,3,4$, or 5 is rolled, then this number becomes their "point number.' The player then has up to three more rolls of the die to roll their point number again. If they do, they win otherwise they lose. Write a program in $\mathrm{R}$ to simulate a game of craps. Explain the steps of your program. If the code is not explained, no points will be earned.
+
+\section*{5. Readable and efficient code}
+
+Read over the code below.
+
+a.
+
+Explain (in text) what the code does.
+
+b.
+
+Explain (in text) what you would change to make the code more readable.
+
+c.
+
+Change the code according to a. and wrap it in a function. This function should have at most 10 lines (without adding commands to more lines such as $\mathrm{x}<-1$; $\mathrm{y}<-2$. Such commands will count as 2 lines!). Check that the function called on the same input outputs the same as the provided code.
+
+![](https://cdn.mathpix.com/cropped/2024_04_03_7eb64c088a827856eb2cg-3.jpg?height=1050&width=927&top_left_y=258&top_left_x=233)
+
+\section*{6. Measuring and improving performance}
+
+Have a look at the code of the function below. It is a function for performing a Kruskal Wallis test, a robust non-parametric method for testing whether samples come from the same distribution. (Note: we assume no missing values are present in $\mathrm{x})$.
+
+![](https://cdn.mathpix.com/cropped/2024_04_03_7eb64c088a827856eb2cg-3.jpg?height=883&width=1652&top_left_y=1598&top_left_x=237)
+
+![](https://cdn.mathpix.com/cropped/2024_04_03_7eb64c088a827856eb2cg-4.jpg?height=802&width=1239&top_left_y=259&top_left_x=237)
+
+a.
+
+Write a pseudo code outlining what the function does.
+
+b.
+
+For example data, call the function in two ways: once using $\mathrm{x}$ as a list and once using $\mathrm{x}$ as a vector with a corresponding $g$ argument. Ensure that the two different function calls return the same thing by aligning the inputs.
+
+c.
+
+Make a faster version of kwtest () that only computes the Kruskal-Wallis test statistic when the input is a numeric variable $\mathrm{x}$ and a variable $\mathrm{g}$ which gives the group membership. You can try simplifying the function above or by coding from the mathematical definition (see https://en.wikipedia.org/wiki/Kruskal\%E2\%80\% 93Wallis_one-way_analysis_of_variance). This function should also perform some checks to ensure the correctness of the inputs (use kwtest() as inspiration).
+
+\section*{d.}
+
+Consider the following scenario. You have samples available from multiple experiments $m=1000$ where you collect the numerical values for the quantity of interest $\mathrm{x}$ and the group membership for $n$ individuals. The first 20 individuals in each sample belong to group 1, the following 20 individuals in each sample belong to group 2, the last 10 individuals in each sample belong to group 3. Use the following code to simulate such a data structure:
+
+![](https://cdn.mathpix.com/cropped/2024_04_03_7eb64c088a827856eb2cg-4.jpg?height=218&width=764&top_left_y=2135&top_left_x=233)
+
+Write a function which performs the Kruskal-Wallis test using the function stats : : kruskal . test .default() for $m$ repeated experiments and returns a vector of $m$ test statistics. The input of this function are a matrix $\mathrm{X}$ with $m$ rows and $n$ columns and a vector $\mathrm{g}$ which gives the grouping.
+e.
+
+Write a function which performs the Kruskal-Wallis test using the function in point $c$. for $m$ repeated experiments and returns a vector of $m$ test statistics. The input of this function are a matrix $\mathrm{X}$ with $m$ rows and $n$ columns and a vector $g$ which gives the grouping.
+
+f.
+
+Compare the performance of the two approaches using a benchmarking package on the data generated above. Comment on the results.
+
+g.
+
+Now consider vectorizing the function in point c. Compare this approach to the other two. Comment on the results.

@@ -1,0 +1,135 @@
+## 2. Gamma function
+
+### a.
+
+Write a function to compute the following for $n$ a positive integer using the gamma function in base $\mathrm{R}$.
+
+$$
+\rho_{n}=\frac{\Gamma((n-1) / 2)}{\Gamma(1 / 2) \Gamma((n-2) / 2)}
+$$
+
+**Answer**
+
+```{r e2a1, dev=c('png')}
+
+rho <- function(n) {
+  return (
+    gamma((n-1)/2) / (gamma(1/2) * gamma((n-2)/2))
+  )
+}
+
+```
+### b.
+
+Try $n=2000$. What do you observe? Why do you think the observed behavior happens?
+
+**Answer**
+
+```{r e2b1, dev=c('png')}
+
+testcases <- c(1, 2, 3, 4, 5, 10, 50, 100, 500, 1000, 2000)
+for (case in testcases) {
+  print(paste("Rho(", case, ") = ", rho(case), sep=""))
+}
+
+```
+This function does not work for $1$ and $2$, 
+since gamma returns $NaN$ for values less or equal to 0
+
+```{r e2b2, dev=c('png')}
+
+testcases <- 100:500
+for (case in testcases) {
+  if (is.nan(rho(case))) {
+    print(paste("Rho breaks at ", case, sep=""))
+    break
+  }
+}
+
+```
+
+If the number gets to big, the inbuilt our functions breaks, 
+since it relies on the inbuilt gamma function, which returns $Inf$
+if the input is to big, which breaks our division
+
+```{r e2b3, dev=c('png')}
+
+testcases <- 1:500
+for (case in testcases) {
+  if (is.infinite(gamma(case))) {
+    print(paste("Gamma returns Inf at ", case, sep=""))
+    break
+  }
+}
+
+```
+
+### c.
+
+Write an implementation which can also deal with large values of $n>1000$.
+
+**Answer**
+
+The given function can be rewritten using logarithms as:
+$$ \log\left(\frac{\Gamma\left(\frac{n-1}{2}\right)}{\Gamma\left(\frac{1}{2}\right) \cdot \Gamma\left(\frac{n-2}{2}\right)}\right) = \log\Gamma\left(\frac{n-1}{2}\right) - \left(\log\Gamma\left(\frac{1}{2}\right) + \log\Gamma\left(\frac{n-2}{2}\right)\right) $$
+which turns the multiplication into additions.
+
+```{r e2c1, dev=c('png')}
+
+rho_log <- function(n) {
+  if (n <= 5) {
+    return (gamma((n-1)/2) / (gamma(1/2) * gamma((n-2)/2)))
+  } else {
+    log_gamma_expr <- lgamma((n - 1) / 2) - (lgamma(1 / 2) + lgamma((n - 2) / 2))
+    return (exp(log_gamma_expr))
+  }
+}
+
+```
+
+### d.
+
+Plot $\rho_{n} / \sqrt{n}$ for different values of $n$. Can you guess the limit of $\rho_{n} / \sqrt{n}$ for $n \rightarrow \infty$ ?
+
+**Answer**
+
+```{r e2d1, dev=c('png')}
+
+rhoOverSqrtN <- function(n) {
+  if (!is.numeric(n)) {
+    stop("n must be numeric.")
+  }
+  
+  return (rho_log(n)/sqrt(n))
+}
+
+x <- 1:1000
+y <- sapply(x, rhoOverSqrtN)
+
+# Filter out invalid values (NA, NaN, Inf)
+valid_indices <- !is.na(y) & !is.nan(y) & !is.infinite(y)
+x <- x[valid_indices]
+y <- y[valid_indices]
+
+plot(x, y, type = 'l', col = 'blue', xlab = "n", ylab = expression(rho[n] / sqrt(n)), main=expression("Plot of " * rho[n] * " over " * sqrt(n)))
+
+```
+
+```{r e2d2, dev=c('png')}
+
+convergence <- tail(y)
+for (c in convergence) {
+  print(c)
+}
+
+```
+The function approaches $3.984$, which is approximately $\frac{1}{\sqrt{2\pi}}$
+
+```{r e2d3, dev=c('png')}
+
+print(paste("Approx. limit:   ", y[length(y)-1]))
+expr <- expression(1/sqrt(2*pi))
+value <- eval(expr)
+print(paste(expr, ": ", value))
+
+```
