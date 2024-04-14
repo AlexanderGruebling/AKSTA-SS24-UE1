@@ -1,15 +1,255 @@
 ## 6. Measuring and improving performance
+```{r}
+kwtest <- function (x, g, ...) {
+  if (is.list(x)) {
+    if (length(x) < 2L)
+      stop("'x' must be a list with at least 2 elements")
+    if (!missing(g))
+      warning("'x' is a list, so ignoring argument 'g'")
+    if (!all(sapply(x, is.numeric)))
+      warning("some elements of 'x' are not numeric and will be coerced to numeric")
+    k <- length(x)
+    l <- lengths(x)
+    if (any(l == 0L))
+      stop("all groups must contain data")
+    g <- factor(rep.int(seq_len(k), l))
+    x <- unlist(x)
+  } else {
+    if (length(x) != length(g))
+      stop("'x' and 'g' must have the same length")
+    g <- factor(g)
+    k <- nlevels(g)
+    if (k < 2L)
+      stop("all observations are in the same group")
+  }
+  n <- length(x)
+  if (n < 2L)
+    stop("not enough observations")
+  r <- rank(x)
+  TIES <- table(x)
+  STATISTIC <- sum(tapply(r, g, sum)^2/tapply(r, g, length))
+  STATISTIC <- ((12 * STATISTIC/(n * (n + 1)) - 3 * (n + 1))/(1 -sum(TIES^3 - TIES)/(n^3 - n)))
+  PARAMETER <- k - 1L
+  PVAL <- pchisq(STATISTIC, PARAMETER, lower.tail = FALSE)
+  names(STATISTIC) <- "Kruskal-Wallis chi-squared"
+  names(PARAMETER) <- "df"
+  RVAL <- list(statistic = STATISTIC, parameter = PARAMETER,
+  p.value = PVAL, method = "Kruskal-Wallis rank sum test")
+  return(RVAL)
+}
+```
+
 
 ### a.
-
+```
+Function kwtest(x, g, ...)
+    If x is a list Then
+        If length of x is less than 2 Then
+            Stop with error "'x' must be a list with at least 2 elements"
+        End If
+        If g is not missing Then
+            Issue warning "'x' is a list, so ignoring argument 'g'"
+        End If
+        If not all elements of x are numeric Then
+            Issue warning "some elements of 'x' are not numeric and will be coerced to numeric"
+        End If
+        Set k to length of x
+        Set l to lengths of x
+        If any element of l is 0 Then
+            Stop with error "all groups must contain data"
+        End If
+        Set g to factor with levels as sequence from 1 to k, repeated l times
+        Unlist x
+    Else
+        If length of x is not equal to length of g Then
+            Stop with error "'x' and 'g' must have the same length"
+        End If
+        Set g to factor of g
+        Set k to number of levels in g
+        If k is less than 2 Then
+            Stop with error "all observations are in the same group"
+        End If
+    End If
+    Set n to length of x
+    If n is less than 2 Then
+        Stop with error "not enough observations"
+    End If
+    Rank x and store in r
+    Create a table of frequencies of x and store in TIES
+    Calculate STATISTIC as sum of squares of ranks in each group divided by the number of ranks in each group
+    Adjust STATISTIC based on the formula provided
+    Set PARAMETER to k - 1
+    Calculate PVAL as the p-value of the chi-squared distribution with PARAMETER degrees of freedom and STATISTIC, using the upper tail
+    Set names of STATISTIC and PARAMETER to "Kruskal-Wallis chi-squared" and "df" respectively
+    Create a list RVAL with statistic, parameter, p.value, and method
+    Return RVAL
+End Function
+```
 ### b.
+```{r}
+data("PlantGrowth")
+group1 <- PlantGrowth$weight[PlantGrowth$group == "ctrl"]
+group2 <- PlantGrowth$weight[PlantGrowth$group == "trt1"]
+group3 <- PlantGrowth$weight[PlantGrowth$group == "trt2"]
+
+result_list <- kwtest(list(group1, group2, group3))
+print(result_list)
+
+# Prepare the data and group assignments
+x_vector <- PlantGrowth$weight
+g_vector <- factor(PlantGrowth$group)
+
+# Perform the Kruskal-Wallis test using x as a vector and g as a factor
+result_vector <- kwtest(x_vector, g_vector)
+print(result_vector)
+
+```
 
 ### c.
+```{r}
+kwtest_fast <- function(x, g) {
+  # Check if x and g are numeric and have the same length
+  if (!is.numeric(x) || !is.numeric(g) || length(x) != length(g)) {
+    stop("'x' and 'g' must be numeric vectors of the same length")
+  }
+  
+  # Check if there are at least two unique groups
+  if (length(unique(g)) < 2) {
+    stop("At least two unique groups are required for Kruskal-Wallis test")
+  }
+  
+  # Compute ranks
+  ranks <- rank(x)
+  
+  # Calculate sum of ranks for each group
+  group_sums <- tapply(ranks, g, sum)
+  
+  # Calculate group sizes
+  group_sizes <- tapply(ranks, g, length)
+  
+  # Calculate H statistic
+  n <- length(x)
+  k <- length(unique(g))
+  H <- (12 / (n * (n + 1))) * sum(group_sums^2 / group_sizes) - 3 * (n + 1)
+  
+  # Calculate degrees of freedom
+  df <- k - 1
+  
+  # Calculate p-value
+  p_value <- pchisq(H, df, lower.tail = FALSE)
+  
+  # Create result list
+  result <- list(
+    statistic = H,
+    parameter = df,
+    p.value = p_value,
+    method = "Kruskal-Wallis rank sum test"
+  )
+  
+  return(result)
+}
+
+
+```
 
 ### d.
+```{r}
+perform_kruskal_wallis_tests <- function(X, g, fun) {
+ test_statistics <- numeric(m)
+ for (i in 1:m) {
+    experiment_data <- X[i, ]
+    
+    test_result <- fun(experiment_data, g)
+    test_statistics[i] <- test_result$statistic
+ }
+  
+ return(test_statistics)
+}
 
+set.seed(1234)
+m <- 1000 # number of repetitions
+n <- 50 # number of individuals
+X <- matrix(rt(m * n, df = 10), nrow = m)
+grp <- rep(1:3, c(20, 20, 10))
+
+test_statistics <- perform_kruskal_wallis_tests(X, grp, stats:::kruskal.test.default)
+print(test_statistics)
+
+```
 ### e.
-
+```{r}
+test_statistics <- perform_kruskal_wallis_tests(X, grp, kwtest_fast)
+print(test_statistics)
+```
 ### f.
+```{r}
+library(bench)
+set.seed(1234)
+m <- 1000 # number of repetitions
+n <- 50 # number of individuals
+X <- matrix(rt(m * n, df = 10), nrow = m)
+grp <- rep(1:3, c(20, 20, 10))
+mark(perform_kruskal_wallis_tests(X, grp, stats:::kruskal.test.default), perform_kruskal_wallis_tests(X, grp, kwtest_fast))
+```
 
 ### g.
+```{r}
+kwtest_vectorized <- function(x, g) {
+  # Check if x and g are numeric and have the same length
+  if (!is.numeric(x) || !is.numeric(g) || length(x) != length(g)) {
+    stop("'x' and 'g' must be numeric vectors of the same length")
+  }
+  
+  # Check if there are at least two unique groups
+  if (length(unique(g)) < 2) {
+    stop("At least two unique groups are required for Kruskal-Wallis test")
+  }
+  
+  # Compute ranks
+  ranks <- rank(x)
+  
+  # Calculate H statistic
+  n <- length(x)
+  k <- length(unique(g))
+  H <- (12 / (n * (n + 1))) * sum(tapply(ranks, g, sum)^2 / tapply(ranks, g, length)) - 3 * (n + 1)
+  
+  # Calculate degrees of freedom
+  df <- k - 1
+  
+  # Calculate p-value
+  p_value <- pchisq(H, df, lower.tail = FALSE)
+  
+  # Create result list
+  result <- list(
+    statistic = H,
+    parameter = df,
+    p.value = p_value,
+    method = "Kruskal-Wallis rank sum test"
+  )
+  
+  return(result)
+}
+
+perform_kwtest_fast_vectorized_tests <- function(X, g) {
+ # Initialize a vector to store the test statistics
+ test_statistics <- numeric(m)
+ for (i in 1:m) {
+    experiment_data <- X[i, ]
+    
+    test_result <- kwtest_fast(experiment_data, g)
+    test_statistics[i] <- test_result$statistic
+ }
+  
+ return(test_statistics)
+}
+
+library(bench)
+set.seed(1234)
+m <- 1000 # number of repetitions
+n <- 50 # number of individuals
+X <- matrix(rt(m * n, df = 10), nrow = m)
+grp <- rep(1:3, c(20, 20, 10))
+mark(perform_kruskal_wallis_tests(X, grp), perform_kwtest_fast_tests(X, grp), perform_kwtest_fast_vectorized_tests(X, grp))
+```
+
+
