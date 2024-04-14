@@ -1,7 +1,77 @@
 ## 1. Ratio of Fibonacci numbers 
 
 ### a.
+At first the function calculating the ratio using a for loop:
+```{r, echo=TRUE}
+r_for <- function(i) {
+  f_i <- 0
+  f_ip1 <- 1
+  result <- c()
+  for (x in 1:i) {
+    f_ip1_new <- f_i+f_ip1
+    f_i <- f_ip1
+    f_ip1 <- f_ip1_new
+    result <- append(result, f_ip1/f_i)
+  }
+  return (result)
+}
+```
+Running the function using a test output:
+```{r, echo=TRUE}
+test_for <- r_for(10)
+print(test_for)
+```
+Next the function using a while-loop:
+```{r, echo=TRUE}
+r_while <- function(i) {
+  f_i <- 0
+  f_ip1 <- 1
+  result <- c()
+  x=0
+  while(x < i) {
+    f_ip1_new <- f_i+f_ip1
+    f_i <- f_ip1
+    f_ip1 <- f_ip1_new
+    result <- append(result, f_ip1/f_i)
+    x = x+1
+  }
+  return (result)
+}
+```
+Running the function using a test output:
+```{r, echo=TRUE}
+test_while <- r_while(10)
+print(test_while)
+```
+As we can see, both functions produce the same outputs, which seem to nicely converge towards the golden ratio.
 
 ### b.
+To test the functions, the microbenchmark package is used. When applying the function, the standard values are used (the number of iterations for the expression is set to 100 here).
+This results in a statistic comprised of n=100 tests.
+```{r, echo=TRUE}
+library(microbenchmark)
+```
+## Testing for n=200: 
+```{r, echo=TRUE}
+microbenchmark(r_for(200))
+microbenchmark(r_while(200))
+```
+Here we can see that the mean time that the "r_for" function took (397.028us) is lower than the "r_while" function (423.145us). For n=200 the for loop is faster.
+
+## Testing for n=2000:
+```{r, echo=TRUE}
+microbenchmark(r_for(2000))
+microbenchmark(r_while(2000))
+```
+Again we can see that the mean time that the "r_for" function took (18.295ms) is lower than the "r_while" function (20.847ms). For n=2000 also the for-loop is faster.
 
 ### c.
+In order to visualize the function, the package "ggplot2" is used. To work with the data it is transformed into a data-frame and an iteration column is added.
+```{r, echo=TRUE}
+library(ggplot2)
+value = r_for(100)
+r_100 <- data.frame(value)
+r_100$iteration <- 1:nrow(r_100)
+ggplot(r_100, aes(x=iteration, y=value)) + geom_point() + geom_line() + ggtitle("Visualization of the approach to the golden ratio with n=100 iterations")
+```
+From the plot, one can deduce that the function converges at around the 6th iteration, from this point on no significant changes are visible.
