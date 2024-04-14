@@ -1,4 +1,5 @@
 ## 6. Measuring and improving performance
+Have a look at the code of the function below. It is a function for performing a Kruskal Wallis test, a robust non-parametric method for testing whether samples come from the same distribution. (Note: we assume no missing values are present in x).
 ```{r}
 kwtest <- function (x, g, ...) {
   if (is.list(x)) {
@@ -41,6 +42,7 @@ kwtest <- function (x, g, ...) {
 
 
 ### a.
+Write a pseudo code outlining what the function does.
 ```
 Function kwtest(x, g, ...)
     If x is a list Then
@@ -85,7 +87,9 @@ Function kwtest(x, g, ...)
     Return RVAL
 End Function
 ```
+
 ### b.
+For example data, call the function in two ways: once using x as a list and once using x as a vector with a corresponding g argument. Ensure that the two different function calls return the same thing by aligning the inputs.
 ```{r}
 data("PlantGrowth")
 group1 <- PlantGrowth$weight[PlantGrowth$group == "ctrl"]
@@ -95,50 +99,36 @@ group3 <- PlantGrowth$weight[PlantGrowth$group == "trt2"]
 result_list <- kwtest(list(group1, group2, group3))
 print(result_list)
 
-# Prepare the data and group assignments
 x_vector <- PlantGrowth$weight
 g_vector <- factor(PlantGrowth$group)
 
-# Perform the Kruskal-Wallis test using x as a vector and g as a factor
 result_vector <- kwtest(x_vector, g_vector)
 print(result_vector)
 
 ```
 
 ### c.
+Make a faster version of kwtest() that only computes the Kruskal-Wallis test statistic when the input is a numeric variable x and a variable g which gives the group membership. You can try simplifying the function above or by coding from the mathematical definition (see https://en.wikipedia.org/wiki/Kruskal%E2%80%93Wallis_one-way_analysis_of_variance). This function should also perform some checks to ensure the correctness of the inputs (use kwtest() as inspiration).
 ```{r}
 kwtest_fast <- function(x, g) {
-  # Check if x and g are numeric and have the same length
   if (!is.numeric(x) || !is.numeric(g) || length(x) != length(g)) {
     stop("'x' and 'g' must be numeric vectors of the same length")
   }
-  
-  # Check if there are at least two unique groups
   if (length(unique(g)) < 2) {
     stop("At least two unique groups are required for Kruskal-Wallis test")
   }
-  
-  # Compute ranks
   ranks <- rank(x)
-  
-  # Calculate sum of ranks for each group
   group_sums <- tapply(ranks, g, sum)
-  
-  # Calculate group sizes
   group_sizes <- tapply(ranks, g, length)
   
-  # Calculate H statistic
   n <- length(x)
   k <- length(unique(g))
   H <- (12 / (n * (n + 1))) * sum(group_sums^2 / group_sizes) - 3 * (n + 1)
   
-  # Calculate degrees of freedom
   df <- k - 1
   
-  # Calculate p-value
   p_value <- pchisq(H, df, lower.tail = FALSE)
   
-  # Create result list
   result <- list(
     statistic = H,
     parameter = df,
@@ -148,22 +138,32 @@ kwtest_fast <- function(x, g) {
   
   return(result)
 }
-
-
 ```
 
 ### d.
+Consider the following scenario. You have samples available from multiple experiments m = 1000 where you
+collect the numerical values for the quantity of interest x and the group membership for n individuals. The
+first 20 individuals in each sample belong to group 1, the following 20 individuals in each sample belong to
+group 2, the last 10 individuals in each sample belong to group 3. Use the following code to simulate such a
+data structure:
+```
+set.seed(1234)
+m <- 1000 # number of repetitions
+n <- 50 # number of individuals
+X <- matrix(rt(m * n, df = 10), nrow = m)
+grp <- rep(1:3, c(20, 20, 10))
+```
+Write a function which performs the Kruskal-Wallis test using the function stats:::kruskal.test.default() for m repeated experiments and returns a vector of m test statistics. The input of this function are a matrix X with m rows and n columns and a vector g which gives the grouping.
 ```{r}
 perform_kruskal_wallis_tests <- function(X, g, fun) {
- test_statistics <- numeric(m)
- for (i in 1:m) {
-    experiment_data <- X[i, ]
-    
-    test_result <- fun(experiment_data, g)
-    test_statistics[i] <- test_result$statistic
- }
+  split_X <- split(X, seq_len(nrow(X)))
   
- return(test_statistics)
+  test_results <- lapply(split_X, function(experiment_data) {
+    fun(experiment_data, g)
+  })
+  
+  test_statistics <- sapply(test_results, function(result) result$statistic)
+  return(unname(test_statistics))
 }
 
 set.seed(1234)
@@ -173,15 +173,19 @@ X <- matrix(rt(m * n, df = 10), nrow = m)
 grp <- rep(1:3, c(20, 20, 10))
 
 test_statistics <- perform_kruskal_wallis_tests(X, grp, stats:::kruskal.test.default)
-print(test_statistics)
+head(test_statistics)
 
 ```
+
 ### e.
+Write a function which performs the Kruskal-Wallis test using the function in point c. for m repeated experiments and returns a vector of m test statistics. The input of this function are a matrix X with m rows and n columns and a vector g which gives the grouping.
 ```{r}
 test_statistics <- perform_kruskal_wallis_tests(X, grp, kwtest_fast)
-print(test_statistics)
+head(test_statistics)
 ```
+
 ### f.
+Compare the performance of the two approaches using a benchmarking package on the data generated above. Comment on the results.
 ```{r}
 library(bench)
 set.seed(1234)
@@ -191,35 +195,28 @@ X <- matrix(rt(m * n, df = 10), nrow = m)
 grp <- rep(1:3, c(20, 20, 10))
 mark(perform_kruskal_wallis_tests(X, grp, stats:::kruskal.test.default), perform_kruskal_wallis_tests(X, grp, kwtest_fast))
 ```
+The results of the benchmarking show a clear picture: The kwtest_fast implementation outperforms the original implementation in almost every metric. The median execution time is down to less than 50%, and also the allocated memory is dramatically lower. 
 
 ### g.
+Now consider vectorizing the function in point c. Compare this approach to the other two. Comment on the results.
 ```{r}
 kwtest_vectorized <- function(x, g) {
-  # Check if x and g are numeric and have the same length
   if (!is.numeric(x) || !is.numeric(g) || length(x) != length(g)) {
     stop("'x' and 'g' must be numeric vectors of the same length")
   }
-  
-  # Check if there are at least two unique groups
   if (length(unique(g)) < 2) {
     stop("At least two unique groups are required for Kruskal-Wallis test")
   }
-  
-  # Compute ranks
   ranks <- rank(x)
   
-  # Calculate H statistic
   n <- length(x)
   k <- length(unique(g))
   H <- (12 / (n * (n + 1))) * sum(tapply(ranks, g, sum)^2 / tapply(ranks, g, length)) - 3 * (n + 1)
   
-  # Calculate degrees of freedom
   df <- k - 1
   
-  # Calculate p-value
   p_value <- pchisq(H, df, lower.tail = FALSE)
   
-  # Create result list
   result <- list(
     statistic = H,
     parameter = df,
@@ -230,26 +227,17 @@ kwtest_vectorized <- function(x, g) {
   return(result)
 }
 
-perform_kwtest_fast_vectorized_tests <- function(X, g) {
- # Initialize a vector to store the test statistics
- test_statistics <- numeric(m)
- for (i in 1:m) {
-    experiment_data <- X[i, ]
-    
-    test_result <- kwtest_fast(experiment_data, g)
-    test_statistics[i] <- test_result$statistic
- }
-  
- return(test_statistics)
-}
-
 library(bench)
 set.seed(1234)
 m <- 1000 # number of repetitions
 n <- 50 # number of individuals
 X <- matrix(rt(m * n, df = 10), nrow = m)
 grp <- rep(1:3, c(20, 20, 10))
-mark(perform_kruskal_wallis_tests(X, grp), perform_kwtest_fast_tests(X, grp), perform_kwtest_fast_vectorized_tests(X, grp))
+mark(
+  perform_kruskal_wallis_tests(X, grp, stats:::kruskal.test.default), 
+  perform_kruskal_wallis_tests(X, grp, kwtest_fast),
+  perform_kruskal_wallis_tests(X, grp, kwtest_vectorized)
+  )
 ```
-
+Vectorizing kwtest_fast() still leads to performance improvements, albeit not as dramatically as before. The median time still decreased, however the allocated memory increased slightly. In most use cases however, the decreased median time is of higher importance than the allocated memory.
 
