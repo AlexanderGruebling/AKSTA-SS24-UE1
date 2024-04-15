@@ -1,4 +1,5 @@
 ## 5. Readable and efficient code
+Read over the code below.
 ```{r}
 set.seed(1)
 x <- rnorm(1000)
@@ -28,12 +29,19 @@ r
 ```
 
 ### a.
+Explain (in text) what the code does.
+
 This code first takes samples of two normally distributed random variables.Then, multiple linear models are calculated, based on different portions of the input data. Afterwards, those models are used to predict that portion of the data, that has not been used to train the models. Finally, the mean squared error is appended to a list and printed out.
 
 ### b.
+Explain (in text) what you would change to make the code more readable.
+
 While achieving its purpose, the code is not structured in an optimal way. First, there is a lot of repetition, which violates the DRY (Don't Repeat Yourself) Principle. To mitigate this, I would suggest refactoring by putting repeated code segments in a dedicated function. Then, the variable representing the mean squared errors is named "r". While this might not be an explicit problem, I would prefer to rename this to a more clear name.
 
 ### c.
+Change the code according to a. and wrap it in a function. This function should have at most 10 lines (without adding commands to more lines such as x <- 1; y <- 2. Such commands will count as 2 lines!).
+Check that the function called on the same input outputs the same as the provided code.
+
 ```{r}
 getLinearModelMeanSquaredError <- function(data, testingRange) {
   fit <- lm(y ~ x, data = data[-testingRange,])

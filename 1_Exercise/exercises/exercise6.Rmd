@@ -8,7 +8,9 @@ kwtest <- function (x, g, ...) {
     if (!missing(g))
       warning("'x' is a list, so ignoring argument 'g'")
     if (!all(sapply(x, is.numeric)))
-      warning("some elements of 'x' are not numeric and will be coerced to numeric")
+      warning(
+        "some elements of 'x' are not numeric and will be coerced to numeric"
+        )
     k <- length(x)
     l <- lengths(x)
     if (any(l == 0L))
@@ -29,7 +31,10 @@ kwtest <- function (x, g, ...) {
   r <- rank(x)
   TIES <- table(x)
   STATISTIC <- sum(tapply(r, g, sum)^2/tapply(r, g, length))
-  STATISTIC <- ((12 * STATISTIC/(n * (n + 1)) - 3 * (n + 1))/(1 -sum(TIES^3 - TIES)/(n^3 - n)))
+  STATISTIC <- (
+    (12 * STATISTIC/(n * (n + 1)) - 3 * (n + 1))/
+      (1 -sum(TIES^3 - TIES)/(n^3 - n))
+    )
   PARAMETER <- k - 1L
   PVAL <- pchisq(STATISTIC, PARAMETER, lower.tail = FALSE)
   names(STATISTIC) <- "Kruskal-Wallis chi-squared"
@@ -53,7 +58,8 @@ Function kwtest(x, g, ...)
             Issue warning "'x' is a list, so ignoring argument 'g'"
         End If
         If not all elements of x are numeric Then
-            Issue warning "some elements of 'x' are not numeric and will be coerced to numeric"
+            Issue warning "some elements of 'x' are not numeric and will be 
+            coerced to numeric"
         End If
         Set k to length of x
         Set l to lengths of x
@@ -76,13 +82,16 @@ Function kwtest(x, g, ...)
     If n is less than 2 Then
         Stop with error "not enough observations"
     End If
-    Rank x and store in r
-    Create a table of frequencies of x and store in TIES
-    Calculate STATISTIC as sum of squares of ranks in each group divided by the number of ranks in each group
+    Set r to rank of x
+    Set TIES to Create a table of x
+    Calculate STATISTIC as sum of squares of ranks in each group divided by the 
+      number of ranks in each group
     Adjust STATISTIC based on the formula provided
     Set PARAMETER to k - 1
-    Calculate PVAL as the p-value of the chi-squared distribution with PARAMETER degrees of freedom and STATISTIC, using the upper tail
-    Set names of STATISTIC and PARAMETER to "Kruskal-Wallis chi-squared" and "df" respectively
+    Calculate PVAL as the p-value of the chi-squared distribution with PARAMETER 
+      degrees of freedom and STATISTIC, using the upper tail
+    Set names of STATISTIC and PARAMETER to "Kruskal-Wallis chi-squared" and 
+      "df" respectively
     Create a list RVAL with statistic, parameter, p.value, and method
     Return RVAL
 End Function
@@ -172,7 +181,8 @@ n <- 50 # number of individuals
 X <- matrix(rt(m * n, df = 10), nrow = m)
 grp <- rep(1:3, c(20, 20, 10))
 
-test_statistics <- perform_kruskal_wallis_tests(X, grp, stats:::kruskal.test.default)
+test_statistics <- perform_kruskal_wallis_tests(
+  X, grp, stats:::kruskal.test.default)
 head(test_statistics)
 
 ```
@@ -193,7 +203,10 @@ m <- 1000 # number of repetitions
 n <- 50 # number of individuals
 X <- matrix(rt(m * n, df = 10), nrow = m)
 grp <- rep(1:3, c(20, 20, 10))
-mark(perform_kruskal_wallis_tests(X, grp, stats:::kruskal.test.default), perform_kruskal_wallis_tests(X, grp, kwtest_fast))
+mark(
+  perform_kruskal_wallis_tests(X, grp, stats:::kruskal.test.default), 
+  perform_kruskal_wallis_tests(X, grp, kwtest_fast)
+  )
 ```
 The results of the benchmarking show a clear picture: The kwtest_fast implementation outperforms the original implementation in almost every metric. The median execution time is down to less than 50%, and also the allocated memory is dramatically lower. 
 
@@ -211,7 +224,8 @@ kwtest_vectorized <- function(x, g) {
   
   n <- length(x)
   k <- length(unique(g))
-  H <- (12 / (n * (n + 1))) * sum(tapply(ranks, g, sum)^2 / tapply(ranks, g, length)) - 3 * (n + 1)
+  H <- (12 / (n * (n + 1))) * sum(tapply(ranks, g, sum)^2 / 
+                                    tapply(ranks, g, length)) - 3 * (n + 1)
   
   df <- k - 1
   
