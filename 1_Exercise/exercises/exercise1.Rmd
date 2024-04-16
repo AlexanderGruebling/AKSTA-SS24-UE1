@@ -1,5 +1,15 @@
 ## 1. Ratio of Fibonacci numbers 
 
+```{r warning=FALSE}
+
+if (!requireNamespace("microbenchmark", quietly = TRUE)) {
+  install.packages("microbenchmark")
+}
+library(microbenchmark)
+
+```
+
+
 ### a.
 At first the function calculating the ratio using a for loop:
 ```{r, echo=TRUE}
@@ -48,9 +58,7 @@ As we can see, both functions produce the same outputs, which seem to nicely con
 ### b.
 To test the functions, the microbenchmark package is used. When applying the function, the standard values are used (the number of iterations for the expression is set to 100 here).
 This results in a statistic comprised of n=100 tests.
-```{r, echo=TRUE}
-library(microbenchmark)
-```
+
 ## Testing for n=200: 
 ```{r, echo=TRUE}
 microbenchmark(r_for(200))
@@ -72,6 +80,9 @@ library(ggplot2)
 value = r_for(100)
 r_100 <- data.frame(value)
 r_100$iteration <- 1:nrow(r_100)
-ggplot(r_100, aes(x=iteration, y=value)) + geom_point() + geom_line() + ggtitle("Visualization of the approach to the golden ratio with n=100 iterations")
+ggplot(r_100, aes(x=iteration, y=value)) + 
+  geom_point() + 
+  geom_line() + 
+  ggtitle("Visualization of the approach to the golden ratio with n=100 iterations")
 ```
 From the plot, one can deduce that the function converges at around the 6th iteration, from this point on no significant changes are visible.

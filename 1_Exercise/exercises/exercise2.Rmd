@@ -48,7 +48,7 @@ for (case in testcases) {
 
 ```
 
-If the number gets to big, the inbuilt our functions breaks, 
+If the number gets to big, our functions breaks, 
 since it relies on the inbuilt gamma function, which returns $Inf$
 if the input is to big, which breaks our division
 
@@ -111,7 +111,13 @@ valid_indices <- !is.na(y) & !is.nan(y) & !is.infinite(y)
 x <- x[valid_indices]
 y <- y[valid_indices]
 
-plot(x, y, type = 'l', col = 'blue', xlab = "n", ylab = expression(rho[n] / sqrt(n)), main=expression("Plot of " * rho[n] * " over " * sqrt(n)))
+plot(x, y, 
+     type = 'l', 
+     col = 'blue', 
+     xlab = "n", 
+     ylab = expression(rho[n] / sqrt(n)), 
+     main=expression("Plot of " * rho[n] * " over " * sqrt(n))
+)
 
 ```
 

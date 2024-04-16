@@ -1,4 +1,14 @@
 ## 6. Measuring and improving performance
+
+```{r warning=FALSE}
+
+if (!requireNamespace("bench", quietly = TRUE)) {
+  install.packages("bench")
+}
+library(bench)
+
+```
+
 Have a look at the code of the function below. It is a function for performing a Kruskal Wallis test, a robust non-parametric method for testing whether samples come from the same distribution. (Note: we assume no missing values are present in x).
 ```{r}
 kwtest <- function (x, g, ...) {
@@ -197,7 +207,6 @@ head(test_statistics)
 ### f.
 Compare the performance of the two approaches using a benchmarking package on the data generated above. Comment on the results.
 ```{r}
-library(bench)
 set.seed(1234)
 m <- 1000 # number of repetitions
 n <- 50 # number of individuals
@@ -241,7 +250,6 @@ kwtest_vectorized <- function(x, g) {
   return(result)
 }
 
-library(bench)
 set.seed(1234)
 m <- 1000 # number of repetitions
 n <- 50 # number of individuals
