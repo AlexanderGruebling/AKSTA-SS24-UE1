@@ -1,0 +1,85 @@
+## 3. Data analysis - Part 2
+
+```{r import_exercise3, message=FALSE, warning=FALSE, include=FALSE}
+
+if (!requireNamespace("dplyr", quietly = TRUE)) {
+  install.packages("dplyr")
+}
+library(dplyr)
+
+if (!requireNamespace("tidyr", quietly = TRUE)) {
+  install.packages("tidyr")
+}
+library(tidyr)
+
+if (!requireNamespace("tidyverse", quietly = TRUE)) {
+  install.packages("tidyverse")
+}
+library(tidyverse)
+
+if (!requireNamespace("knitr", quietly = TRUE)) {
+  install.packages("knitr")
+}
+library(knitr)
+
+```
+
+```{r path_determination_exercise3, include=FALSE}
+
+# Determine if it's running as a child or not
+# to fix paths when knitting
+if (requireNamespace("rstudioapi", quietly = TRUE)) {
+ script_path <- rstudioapi::getActiveDocumentContext()$path
+ 
+ if (endsWith(dirname(script_path), "exercises")) {
+   working_directory_path <- dirname(dirname(script_path))
+ } else {
+   working_directory_path <- dirname(script_path)
+ }
+ 
+} else {
+ message("RStudio API is not available")
+}
+
+```
+
+### m.
+
+Create a table of average values for median age, youth unemployment rate and net
+migration rate separated into income status. Make sure that in the output, the
+ordering of the income classes is proper (i.e., L, LM, UM, H or the other way
+around). Briefly comment the results.
+
+**Answer**
+
+### n.
+
+Look also at the standard deviation instead of the mean in m. 
+Do you gain additional insights? Briefly comment the results.
+
+**Answer**
+
+### o.
+
+Repeat the analysis in $\mathrm{m}$. for each income status and continent combination. 
+Discuss the results.
+
+**Answer**
+
+### p.
+
+Identify countries which are doing well in terms of both youth unemployment and
+net migration rate (in the top $25 \%$ of their respective continent in terms of
+net migration rate and in the bottom $25 \%$ of their respective continent in
+terms of youth unemployment).
+
+**Answer**
+
+### r.
+
+Export the final data set to a csv with ";" separator and "." as a symbol for
+missing values; no rownames should be included in the csv. Upload the .csv to
+TUWEL together with your .Rmd and .html (or .pdf).
+
+**Answer**
+

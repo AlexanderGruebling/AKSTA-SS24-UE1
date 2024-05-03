@@ -1,0 +1,22 @@
+---
+title: "Case Study 2"
+subtitle: "AKSTA Statistical Computing"
+author: "Tatzberger Jonas, Rasser Thomas, Grübling Alexander"
+date: "03.05.2024"
+output: pdf_document
+---
+
+# Exercises
+
+```{r, child="exercises/exercise1.Rmd"}
+```
+
+```{r, child="exercises/exercise2.Rmd"}
+```
+
+```{r, child="exercises/exercise3.Rmd"}
+```
+
+</div>
+
+</pre>

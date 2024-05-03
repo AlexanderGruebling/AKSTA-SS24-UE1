@@ -1,0 +1,443 @@
+## 1. Data Import
+
+```{r import_exercise1, message=FALSE, warning=FALSE, include=FALSE}
+
+if (!requireNamespace("readr", quietly = TRUE)) {
+  install.packages("readr")
+}
+library(readr)
+
+if (!requireNamespace("dplyr", quietly = TRUE)) {
+  install.packages("dplyr")
+}
+library(dplyr)
+
+if (!requireNamespace("tidyr", quietly = TRUE)) {
+  install.packages("tidyr")
+}
+library(tidyr)
+
+if (!requireNamespace("tidyverse", quietly = TRUE)) {
+  install.packages("tidyverse")
+}
+library(tidyverse)
+
+if (!requireNamespace("readxl", quietly = TRUE)) {
+  install.packages("readxl")
+}
+library(readxl)
+
+if (!requireNamespace("assertthat", quietly = TRUE)) {
+  install.packages("assertthat")
+}
+library(assertthat)
+
+if (!requireNamespace("knitr", quietly = TRUE)) {
+  install.packages("knitr")
+}
+library(knitr)
+
+```
+
+```{r path_determination_exercise1, include=FALSE}
+
+# Determine if it's running as a child or not
+# to fix paths when knitting
+if (requireNamespace("rstudioapi", quietly = TRUE)) {
+ script_path <- rstudioapi::getActiveDocumentContext()$path
+ 
+ if (endsWith(dirname(script_path), "exercises")) {
+   working_directory_path <- dirname(dirname(script_path))
+ } else {
+   working_directory_path <- dirname(script_path)
+ }
+ 
+} else {
+ message("RStudio API is not available")
+}
+
+```
+
+### a.
+
+Load in $\mathrm{R}$ the following data sets which you can find in TUWEL. For
+each data set, ensure that missing values are read in properly, that column
+names are unambiguous. Each data set should contain at the end only two columns:
+country and the variable.
+
+**Answer**
+
+```{r a0}
+
+check_number_of_rows <- function(expected_rowcount, expected_colcount, given_tibble) {
+  real_rowcount = nrow(given_tibble)
+  real_colcount = ncol(given_tibble)
+  
+  result <- assert_that(real_rowcount == expected_rowcount,
+              msg = paste0("There should be ", 
+                           expected_rowcount, 
+                           " rows instead of ", 
+                           real_rowcount))
+  
+  result <- assert_that(real_colcount == expected_colcount,
+              msg = paste0("There should be ", 
+                           real_colcount, 
+                           " columns instead of ", 
+                           expected_colcount))
+}
+
+```
+
+```{r a1}
+
+# Import "rawdata_347.txt" for "net migration rate"
+
+# Read the data file
+file_path <- paste0(working_directory_path, "/data/rawdata_347.txt")
+lines <- readLines(file_path)
+
+# Convert lines to a tibble
+migration_rate <- map_dfr(lines, function(line) {
+  parts <- strsplit(trimws(line), "\\s{2,}")[[1]]
+  tibble(
+    Country = parts[2],
+    Net_Migration_Rate = as.numeric(parts[3])
+  )
+}, .id = NULL) %>% 
+  filter(!is.na(Country), Country != "")
+
+# Make sure all rows have been read
+check_number_of_rows(227, 2, migration_rate)
+head(migration_rate)
+
+
+```
+
+```{r a2}
+
+# Import "rawdata_343.txt" for "median age"
+
+# Read the data file
+file_path <- paste0(working_directory_path, "/data/rawdata_343.txt")
+lines <- readLines(file_path)
+
+# Convert lines to a tibble
+median_age <- map_dfr(lines, function(line) {
+  parts <- strsplit(trimws(line), "\\s{2,}")[[1]]
+  tibble(
+    Country = parts[2],
+    Median_Age = as.numeric(parts[3])
+  )
+}, .id = NULL) %>% 
+  filter(!is.na(Country), Country != "")
+
+# Make sure all rows have been read
+check_number_of_rows(227, 2, median_age)
+head(median_age)
+
+```
+
+
+```{r a3}
+
+# Importing rawdata_373.csv (youth unemployment rate per country)
+file_path <- paste0(working_directory_path, "/data/rawdata_373.csv")
+youth_unemployment <- read_csv(file_path,
+                               skip = 1, # Skip the predefined column names
+                               col_names = c("Country", "Youth_Unemployment_Rate"),
+                               col_types = c("c", "d"))  %>% 
+                      filter(!is.na(Country), Country != "")
+
+# Make sure all rows have been read
+check_number_of_rows(181, 2, youth_unemployment)
+head(youth_unemployment)
+
+```
+
+
+### b.
+
+Merge the data sets containing raw data using dplyr function on the unique keys.
+Keep the union of all observations in the tables. What key are you using for
+merging? Return the dimension of the merged data set.
+
+**Answer**
+
+```{r b1}
+
+# Merge the tibbles on the "Country" key
+merged_country_data <- migration_rate %>%
+  full_join(median_age, by = "Country") %>%
+  full_join(youth_unemployment, by = "Country")
+
+
+print(paste0("Dimensions: "))
+print(dim(merged_country_data))
+
+# Make sure the merge is correct
+check_number_of_rows(227, 4, merged_country_data)
+head(merged_country_data)
+
+```
+```{r b2}
+
+# empty values
+na_value_countries <- merged_country_data %>%
+  filter(apply(., 1, anyNA))
+
+print(nrow(na_value_countries))
+head(na_value_countries)
+
+```
+As expected, there are 46 rows with NA as value in the youth unemployment rate column,
+since the given rawdata file, has fewer countries listed
+
+### c.
+
+You will acquire more country level information such as the classification of
+the country based on income. Such an information can be found at
+https://datahelpdesk.worldbank.org/knowledgebase/articles/906519. 
+From there extract the classification for 2020 into 
+low/lower-middle/upper-middle/high income countries.
+
+**Answer**
+
+```{r c1, message=FALSE}
+
+# Importing rawdata from historical data file
+file_path <- paste0(working_directory_path, "/data/OGHIST.xlsx")
+full_excel_file <- read_excel(file_path, 
+                   sheet = "Country Analytical History",
+                   range = cell_cols("A:AL"))
+```
+
+```{r c2}
+
+head(full_excel_file)
+
+```
+
+```{r c3}
+
+# Get the range for the year columns
+year_col_range <- 3:ncol(full_excel_file)
+
+# Extract the years and change column names
+classification <- full_excel_file[11:nrow(full_excel_file), ]
+colnames(classification) <- 
+  c("ISO", "Country", full_excel_file[5, year_col_range])
+
+# Convert classification columns to factors, replacing ".." with NA
+classification[, year_col_range] <- 
+  lapply(classification[, year_col_range], 
+         function(x) as.factor(replace(x, x == "..", NA)))
+
+# Filter out rows where ISO is NA
+classification <- classification[!is.na(classification$ISO), ]
+
+head(classification)
+
+```
+
+```{r c4}
+
+# Get classification for 2020
+classification_2020 <- classification[, c("ISO", "Country", "2020")]
+colnames(classification_2020) <- c("ISO", "Country", "Classification 2020")
+print(classification_2020[order(classification_2020$Country), ])
+
+```
+
+
+### d.
+
+Merge this information to the data set in b.
+
+1. What are the common variables? Can you merge using them? Why or why not?
+
+2. A reliable merging for countries are ISO codes as they are standardized across
+data sources. Download the mapping of ISO codes to countries from
+https://www.cia.gov/the-world-factbook/references/countrydata-codes/ and load it
+
+3. Merge the data sets using the ISO codes.
+
+**Answer**
+
+```{r d1}
+
+# Check for countries which are in my merged list, 
+# but not in the classification list, 
+# if just merged by country name
+missing_countries <- setdiff(merged_country_data$Country, classification_2020$Country)
+print(sort(missing_countries))
+
+```
+If we would just merge by the country name, there would be over 40 countries
+missing, which are in my merged_data list. The reason could be e.g. different spelling,
+different order (Korea, South) or the countries are just not included.
+In summary, a lack of standardization hinders us in linking the data
+
+```{r d2}
+
+# Importing country data codes from "Country Data Codes"
+file_path <- paste0(working_directory_path, "/data/Country Data Codes.csv")
+country_data_codes <- read_csv(file_path, show_col_types = FALSE)
+
+# Get subset and rename columns
+iso <- country_data_codes[, c("Name", "GENC")]
+colnames(iso) <- c("Country", "ISO")
+iso[iso == "-"] <- NA
+
+# Merge iso into existing data set
+merged_country_data_with_iso <- merged_country_data %>%
+  full_join(iso, by = "Country")
+merged_country_data <- merged_country_data_with_iso
+
+head(merged_country_data)
+
+```
+
+Even though we added most codes, there are still a few missing, which
+have to be added manually since the matching is not perfect
+
+```{r d3}
+
+# List countries without iso
+print(merged_country_data[is.na(merged_country_data$ISO), ])
+
+```
+```{r d4}
+
+merged_country_data$ISO[merged_country_data$Country == "Turkey"] <- "TUR"
+merged_country_data$ISO[merged_country_data$Country == "Macedonia"] <- "MKD"
+
+# List countries without ISO
+print(merged_country_data[is.na(merged_country_data$ISO), ])
+
+```
+
+For the countries that are still without ISO, 
+there are special political and regional reasons, 
+which is why they cannot be added.
+
+```{r d5}
+
+# Merge classification into existing data set
+merged_country_data_with_class_2020 <- merged_country_data %>%
+  full_join(classification_2020[, c("ISO", "Classification 2020")], by = "ISO")
+merged_country_data <- merged_country_data_with_class_2020
+
+head(merged_country_data)
+
+```
+
+
+### e.
+
+Introduce into the data set information on continent for each country and
+subcontinent (region). You should find a way to gather this data. You can find
+an appropriate online resource, download the data and merge the information with
+the existing data set. Name the merged data set df_vars.
+
+**Answer**
+
+To add the requested region data, the following dataset has been used:
+https://statisticstimes.com/geography/countries-by-continents.php
+
+```{r e1}
+
+# Importing continent and region data
+file_path <- paste0(working_directory_path, "/data/continent_region_data.csv")
+continent_region_data <- read_delim(file_path, 
+                                    delim = ";", 
+                                    locale = locale(encoding = "UTF-8"), 
+                                    show_col_types = FALSE)
+
+# Get subset and rename columns
+continent_region_data_subset <- 
+  continent_region_data[, c("ISO-alpha3", "Region 1", "Continent")]
+colnames(continent_region_data_subset) <- 
+ c("ISO", "Region", "Continent")
+ 
+# Merge into existing data set
+merged_country_data_with_region <- merged_country_data %>%
+  full_join(continent_region_data_subset, by = "ISO")
+
+# Create new dataset
+df_vars <- merged_country_data_with_region
+head(df_vars)
+
+```
+
+### f.
+
+Discuss on the tidyness of the data set df_vars. What are the observational
+units, what are the variables? What can be considered fixed vs measured
+variables? Tidy the data if needed.
+
+**Answer**
+
+```{r f1}
+
+str(df_vars)
+
+```
+**Observational units vs variables***
+
+In the given data frame (df_vars), the observational units are the countries. 
+Each row represents a different country.
+
+The variables in the data frame are:
+
+1. `Country`: The name of the country (character/string variable).
+2. `Net_Migration_Rate`: The net migration rate for the country (numeric variable).
+3. `Median_Age`: The median age of the population in the country (numeric variable).
+4. `Youth_Unemployment_Rate`: The youth unemployment rate in the country (numeric variable).
+5. `ISO`: The ISO code for the country (character/string variable).
+6. `Classification 2020`: The classification of the country, which is a factor with four levels: "H", "L", "LM", and "UM" (factor variable).
+7. `Region`: The region to which the country belongs (character/string variable).
+8. `Continent`: The continent where the country is located (character/string variable).
+
+as can be seen via str(df_vars)
+
+**Fixed vs mesured variables**
+
+Fixed variables are those that do not vary within the dataset. 
+In this case, the fixed variables are:
+- `Country`
+- `ISO`
+- `Region`
+- `Continent`
+
+These variables are essentially identifiers or labels for the observational units (countries) 
+and do not change within the dataset.
+
+Measured variables are those that are measured for each observational unit. 
+In this case, the measured variables are:
+- `Net_Migration_Rate`
+- `Median_Age`
+- `Youth_Unemployment_Rate`
+- `Classification 2020`
+
+These variables represent quantitative or categorical measurements or characteristics of the countries.
+
+**Tydiness**
+
+A tidy dataset has the following characteristics:
+
+1. Each variable forms a column.
+2. Each observation forms a row.
+3. Each type of observational unit forms a table.
+
+Analyzing df_vars:
+
+1. Each variable forms a column:
+   - Each variable (`Country`, `Net_Migration_Rate`, ...) forms a separate column, which satisfies this principle.
+
+2. Each observation forms a row:
+   - In this case, each row represents an observation, which is a country. Therefore, this principle is also satisfied.
+
+3. Each type of observational unit forms a table:
+   - The dataset contains only one type of observational unit, which is countries. All the observations (rows) and variables (columns) pertain to countries, so this principle is satisfied as well.
+
+Based on this analysis, the dataset appears to be in a tidy format.

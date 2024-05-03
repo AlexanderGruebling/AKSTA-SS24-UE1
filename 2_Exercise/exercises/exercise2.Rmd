@@ -1,0 +1,88 @@
+## 2. Data analysis - Part 1
+
+```{r import_exercise2, message=FALSE, warning=FALSE, include=FALSE}
+
+if (!requireNamespace("dplyr", quietly = TRUE)) {
+  install.packages("dplyr")
+}
+library(dplyr)
+
+if (!requireNamespace("tidyr", quietly = TRUE)) {
+  install.packages("tidyr")
+}
+library(tidyr)
+
+if (!requireNamespace("tidyverse", quietly = TRUE)) {
+  install.packages("tidyverse")
+}
+library(tidyverse)
+
+if (!requireNamespace("knitr", quietly = TRUE)) {
+  install.packages("knitr")
+}
+library(knitr)
+
+```
+
+```{r path_determination_exercise2, include=FALSE}
+
+# Determine if it's running as a child or not
+# to fix paths when knitting
+if (requireNamespace("rstudioapi", quietly = TRUE)) {
+ script_path <- rstudioapi::getActiveDocumentContext()$path
+ 
+ if (endsWith(dirname(script_path), "exercises")) {
+   working_directory_path <- dirname(dirname(script_path))
+ } else {
+   working_directory_path <- dirname(script_path)
+ }
+ 
+} else {
+ message("RStudio API is not available")
+}
+
+```
+
+### g.
+
+Make a frequency table for the status variable in the merged data set. Briefly
+comment on the results.
+
+**Answer**
+
+### h.
+
+What is the distribution of income status in the different continents? Compute
+the absolute frequencies as well as the relative frequency of status within each
+continent. Briefly comment on the results.
+
+**Answer**
+
+### i.
+
+From h. identify the countries which are the only ones in their respective
+group. Explain in few words the output.
+
+**Answer**
+
+### j.
+
+For each continent count the number of sub-regions in the data set. How granular
+are the subcontinents that you employ in the analysis?
+
+**Answer**
+
+### k.
+
+Look at the frequency distribution of income status in the subregions of Nort- 
+and South-Americas. Comment on the results.
+
+**Answer**
+
+### l.
+
+Dig deeper into the low-middle income countries of the Americas. 
+Which ones are they? Are they primarily small island states in the Caribbean? 
+Comment.
+
+**Answer**
