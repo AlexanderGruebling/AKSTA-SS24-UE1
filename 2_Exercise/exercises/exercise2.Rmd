@@ -43,12 +43,19 @@ if (requireNamespace("rstudioapi", quietly = TRUE)) {
 
 ```
 
+```{r init, echo=FALSE}
+# load the data
+df_vars <- read.csv("../data/df_vars.csv")
+```
 ### g.
 
 Make a frequency table for the status variable in the merged data set. Briefly
 comment on the results.
 
-**Answer**
+```{r g}
+df_vars %>% mutate(status = fct_infreq(Classification_2020)) %>% count(status)
+```
+**ADD COMMENT!**
 
 ### h.
 
@@ -56,6 +63,12 @@ What is the distribution of income status in the different continents? Compute
 the absolute frequencies as well as the relative frequency of status within each
 continent. Briefly comment on the results.
 
+```{r h}
+by_cont <- df_vars %>% group_by(Continent)
+income_status <- by_cont %>% count(Classification_2020) %>% mutate(abs = n, freq = n/sum(n))
+income_status$n <- NULL
+head(income_status)
+```
 **Answer**
 
 ### i.
@@ -63,6 +76,11 @@ continent. Briefly comment on the results.
 From h. identify the countries which are the only ones in their respective
 group. Explain in few words the output.
 
+```{r i}
+abs_1 <- income_status %>% filter(abs==1) %>% select(Continent, Classification_2020)
+abs_1 <- left_join(abs_1, df_vars)
+abs_1
+```
 **Answer**
 
 ### j.
@@ -70,12 +88,27 @@ group. Explain in few words the output.
 For each continent count the number of sub-regions in the data set. How granular
 are the subcontinents that you employ in the analysis?
 
+```{r j}
+by_cont %>% summarise(sub_regions = n_distinct(Region))
+```
+
 **Answer**
 
 ### k.
 
-Look at the frequency distribution of income status in the subregions of Nort- 
+Look at the frequency distribution of income status in the subregions of North- 
 and South-Americas. Comment on the results.
+
+```{r k}
+na <- df_vars %>% filter(Continent=="North America")
+sa <- df_vars %>% filter(Continent=="South America")
+americas <- full_join(na, sa)
+
+by_region <- americas %>% group_by(Region)
+income_status_am <- by_region %>% count(Classification_2020) %>% mutate(abs = n, freq = n/sum(n))
+income_status_am$n <- NULL
+head(income_status_am)
+```
 
 **Answer**
 
@@ -84,5 +117,11 @@ and South-Americas. Comment on the results.
 Dig deeper into the low-middle income countries of the Americas. 
 Which ones are they? Are they primarily small island states in the Caribbean? 
 Comment.
+
+```{r l}
+americas_LM <- income_status_am %>% filter(Classification_2020=="LM")
+americas_LM <- left_join(americas_LM, df_vars)
+americas_LM
+```
 
 **Answer**

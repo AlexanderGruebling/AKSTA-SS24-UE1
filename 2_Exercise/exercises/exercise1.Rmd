@@ -243,7 +243,7 @@ head(classification)
 
 # Get classification for 2020
 classification_2020 <- classification[, c("ISO", "Country", "2020")]
-colnames(classification_2020) <- c("ISO", "Country", "Classification 2020")
+colnames(classification_2020) <- c("ISO", "Country", "Classification_2020")
 print(classification_2020[order(classification_2020$Country), ])
 
 ```
@@ -324,7 +324,7 @@ which is why they cannot be added.
 
 # Merge classification into existing data set
 merged_country_data_with_class_2020 <- merged_country_data %>%
-  full_join(classification_2020[, c("ISO", "Classification 2020")], by = "ISO")
+  full_join(classification_2020[, c("ISO", "Classification_2020")], by = "ISO")
 merged_country_data <- merged_country_data_with_class_2020
 
 head(merged_country_data)
@@ -380,7 +380,8 @@ variables? Tidy the data if needed.
 ```{r f1}
 
 str(df_vars)
-
+# save the data for further usage
+write_csv(df_vars, path = "../data/df_vars.csv")
 ```
 **Observational units vs variables***
 
@@ -394,7 +395,7 @@ The variables in the data frame are:
 3. `Median_Age`: The median age of the population in the country (numeric variable).
 4. `Youth_Unemployment_Rate`: The youth unemployment rate in the country (numeric variable).
 5. `ISO`: The ISO code for the country (character/string variable).
-6. `Classification 2020`: The classification of the country, which is a factor with four levels: "H", "L", "LM", and "UM" (factor variable).
+6. `Classification_2020`: The classification of the country, which is a factor with four levels: "H", "L", "LM", and "UM" (factor variable).
 7. `Region`: The region to which the country belongs (character/string variable).
 8. `Continent`: The continent where the country is located (character/string variable).
 
@@ -417,7 +418,7 @@ In this case, the measured variables are:
 - `Net_Migration_Rate`
 - `Median_Age`
 - `Youth_Unemployment_Rate`
-- `Classification 2020`
+- `Classification_2020`
 
 These variables represent quantitative or categorical measurements or characteristics of the countries.
 
