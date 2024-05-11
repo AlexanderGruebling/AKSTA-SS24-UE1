@@ -55,7 +55,7 @@ comment on the results.
 ```{r g}
 df_vars %>% mutate(status = fct_infreq(Classification_2020)) %>% count(status)
 ```
-**ADD COMMENT!**
+We can see that the biggest part of the countries actually falls into the high income class, in the middle classes "UM" and "LM" there are about an even amount of countries. Only 27 countries fall under low income. However there are relatively many NA values present which might skew the previous observations.
 
 ### h.
 
@@ -67,9 +67,9 @@ continent. Briefly comment on the results.
 by_cont <- df_vars %>% group_by(Continent)
 income_status <- by_cont %>% count(Classification_2020) %>% mutate(abs = n, freq = n/sum(n))
 income_status$n <- NULL
-head(income_status)
+income_status
 ```
-**Answer**
+From this table it is clearly visible that the continents with the highes income are Europe and North America, both of which have no countries classified in "L" and very few in "LM". Next is Oceania also having no "L"-countries, but an even spread between the other categories. South America is also void of "L"-classified countries, with most of them being in the "UM" category. Asia has a few "L"-countries and also an even spread between the others. The poorest continent is Africa, only having one country in the "H" category and many in the "L" and "LM" categories.
 
 ### i.
 
@@ -79,9 +79,9 @@ group. Explain in few words the output.
 ```{r i}
 abs_1 <- income_status %>% filter(abs==1) %>% select(Continent, Classification_2020)
 abs_1 <- left_join(abs_1, df_vars)
-abs_1
+abs_1 %>% select(Continent, Classification_2020, Country)
 ```
-**Answer**
+In the output we have 1 NA value, Antarctica (which is the only country on the continent), Seychelles (the only "H" rated country in Africa) and Ukraine and Bolivia which are the only "LM" rated countries in Europe/South America respectively.
 
 ### j.
 
@@ -92,7 +92,7 @@ are the subcontinents that you employ in the analysis?
 by_cont %>% summarise(sub_regions = n_distinct(Region))
 ```
 
-**Answer**
+The continents are separated into sub regions in a very different way. None of them have more than 5 sub-regions, however while a rather small continent such as Europe has 4 sub-regions, really big ones like Asia and Africa are also only split into 5. South America even has only 1 sub-region.
 
 ### k.
 
@@ -107,10 +107,10 @@ americas <- full_join(na, sa)
 by_region <- americas %>% group_by(Region)
 income_status_am <- by_region %>% count(Classification_2020) %>% mutate(abs = n, freq = n/sum(n))
 income_status_am$n <- NULL
-head(income_status_am)
+income_status_am
 ```
 
-**Answer**
+The Caribbean seems to have rather high income with the biggest part of countries being classified in "H", the same is true for North America. Central America is equally split between "LM" and "UM". South American countries are mostly classified in "UM", with a few in "H" and "LM".
 
 ### l.
 
@@ -124,4 +124,4 @@ americas_LM <- left_join(americas_LM, df_vars)
 americas_LM
 ```
 
-**Answer**
+They are primarily states in Central America, only one of them is a Central American island nation.
