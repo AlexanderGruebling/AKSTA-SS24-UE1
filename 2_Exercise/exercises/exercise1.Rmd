@@ -235,6 +235,11 @@ classification[, year_col_range] <-
 # Filter out rows where ISO is NA
 classification <- classification[!is.na(classification$ISO), ]
 
+# Fix "Kosovo" iso
+# (This "issue" has been found out later on)
+classification <- classification %>%
+  mutate(ISO = if_else(Country == "Kosovo", "XKS", ISO))
+
 head(classification)
 
 ```
@@ -324,13 +329,32 @@ which is why they cannot be added.
 
 # Merge classification into existing data set
 merged_country_data_with_class_2020 <- merged_country_data %>%
-  full_join(classification_2020[, c("ISO", "Classification_2020")], by = "ISO")
+  full_join(classification_2020, by = "ISO") %>%
+  mutate(Country = coalesce(Country.x, Country.y)) %>%
+  select(-Country.x, -Country.y)
 merged_country_data <- merged_country_data_with_class_2020
 
 head(merged_country_data)
 
 ```
+```{r d6}
 
+# List countries with classification,
+# but un-joined otherwise
+missing_data <- merged_country_data %>% 
+  filter(!is.na(Classification_2020) 
+          & (is.na(Net_Migration_Rate) 
+            | is.na(Median_Age) 
+            # | is.na(Youth_Unemployment_Rate)
+           ))
+
+print(missing_data)
+
+# Remove "Turkey (Turkiye)" as it is listed twice
+merged_country_data <- merged_country_data %>%
+  filter(Country != "Turkey (Turkiye)")
+
+```
 
 ### e.
 
@@ -369,6 +393,35 @@ head(df_vars)
 
 ```
 
+```{r}
+
+# List countries without region data,
+# but with Classification data
+missing_data <- df_vars %>% 
+  filter(is.na(Continent) & !is.na(Classification_2020))
+
+print(missing_data)
+
+# Add missing data manually
+df_vars <- df_vars %>%
+  mutate(
+    Continent = case_when(
+      Country == "Taiwan" ~ "Asia",
+      Country == "Kosovo" ~ "Europe",
+      Country == "Channel Islands" ~ "Europe",
+      TRUE ~ Continent
+    ),
+    Region = case_when(
+      Country == "Taiwan" ~ "Eastern Asia",
+      Country == "Kosovo" ~ "Southern Europe",
+      Country == "Channel Islands" ~ "Northern Europe",
+      TRUE ~ Region
+    )
+  )
+
+```
+
+
 ### f.
 
 Discuss on the tidyness of the data set df_vars. What are the observational
@@ -381,7 +434,8 @@ variables? Tidy the data if needed.
 
 str(df_vars)
 # save the data for further usage
-write_csv(df_vars, path = "../data/df_vars.csv")
+write_csv(df_vars, file = "../data/df_vars.csv")
+
 ```
 **Observational units vs variables***
 
@@ -401,7 +455,7 @@ The variables in the data frame are:
 
 as can be seen via str(df_vars)
 
-**Fixed vs mesured variables**
+**Fixed vs measured variables**
 
 Fixed variables are those that do not vary within the dataset. 
 In this case, the fixed variables are:

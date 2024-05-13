@@ -3,3 +3,4 @@
 *.Rproj.user*
 *gitignore.swp*
 *.README.md.swp*
+.Rproj.user

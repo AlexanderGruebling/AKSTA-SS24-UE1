@@ -43,7 +43,7 @@ if (requireNamespace("rstudioapi", quietly = TRUE)) {
 
 ```
 
-```{r init, echo=FALSE}
+```{r initilaize data, echo=FALSE}
 # load the data
 df_vars <- read.csv("../data/df_vars.csv")
 ```
