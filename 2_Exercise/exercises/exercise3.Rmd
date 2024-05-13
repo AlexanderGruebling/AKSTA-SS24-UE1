@@ -43,6 +43,15 @@ if (requireNamespace("rstudioapi", quietly = TRUE)) {
 
 ```
 
+```{r init}
+df_vars <- read.csv("../data/df_vars.csv")
+df_vars$Classification_2020 <- factor(
+  df_vars$Classification_2020, 
+  levels = c("L", "LM", "UM", "H")
+  )
+```
+
+
 ### m.
 
 Create a table of average values for median age, youth unemployment rate and net
@@ -51,6 +60,19 @@ ordering of the income classes is proper (i.e., L, LM, UM, H or the other way
 around). Briefly comment the results.
 
 **Answer**
+```{r}
+average_values <- df_vars %>%
+  group_by(Classification_2020) %>%
+  arrange(Classification_2020) %>%
+  summarize(
+    Avg_Net_Migration_rate = mean(Net_Migration_Rate, na.rm = TRUE),
+    Avg_Median_Age = mean(Median_Age, na.rm = TRUE),
+    Avg_Youth_Unemployment_rate = mean(Youth_Unemployment_Rate, na.rm = TRUE)
+  )
+print(average_values)
+```
+Regarding the average net migration rate, it is interesting to note that all income classes feature negative values except for the higher income class. A negative migration rate suggests that more people are emigrating than immigrating in the country, which could point towards some form of "Brain drain", which of course would have some effect on the countries economy.\\
+The average median age is also highest in higher income countries, which reminds of often cited statistics linking economic prosperity with a lower birth rate and generally older populations.
 
 ### n.
 
@@ -58,6 +80,18 @@ Look also at the standard deviation instead of the mean in m.
 Do you gain additional insights? Briefly comment the results.
 
 **Answer**
+```{r}
+average_standard_deviation <- df_vars %>%
+  group_by(Classification_2020) %>%
+  arrange(Classification_2020) %>%
+  summarize(
+    Avg_Net_Migration_rate = sd(Net_Migration_Rate, na.rm = TRUE),
+    Avg_Median_Age = sd(Median_Age, na.rm = TRUE),
+    Avg_Youth_Unemployment_rate = sd(Youth_Unemployment_Rate, na.rm = TRUE)
+  )
+print(average_standard_deviation)
+```
+Standard deviation is a measure spread in the underlying distribution of data. Regarding sampled data, it can be seen as a measure of "insecurity" in the data. Thus, the standard deviation of the average net migration rate of the upper middle income class immediately stands out. In a more thorough data analysis, I would suggest performing a deeper investigation of the values in this class. Also, outlier detection could be performed or more robust measures than standard deviation, such as MAD or Trimmed Standard Deviation could be used.
 
 ### o.
 
@@ -65,6 +99,18 @@ Repeat the analysis in $\mathrm{m}$. for each income status and continent combin
 Discuss the results.
 
 **Answer**
+```{r}
+average_values_continent <- df_vars %>%
+  group_by(Classification_2020, Continent) %>%
+  arrange(Classification_2020) %>%
+  summarize(
+    Avg_Net_Migration_rate = mean(Net_Migration_Rate, na.rm = TRUE),
+    Avg_Median_Age = mean(Median_Age, na.rm = TRUE),
+    Avg_Youth_Unemployment_rate = mean(Youth_Unemployment_Rate, na.rm = TRUE)
+  )
+print(average_values_continent)
+```
+Naturally, a grouping of every income class and continent pairing returns a lot more rows than the queries before. While it is hard to point out much given this list, it is intriguing for example to look at the average median age for the contintent Europe. It is common to think of Europe as a continent with an old population, and this also shows here, with Europe having the oldest average median age for all income classes compared with other continents.
 
 ### p.
 
@@ -74,6 +120,25 @@ net migration rate and in the bottom $25 \%$ of their respective continent in
 terms of youth unemployment).
 
 **Answer**
+```{r}
+continent_quartiles <- df_vars %>%
+  group_by(Continent) %>%
+  summarize(
+    Net_Migration_Q1 = quantile(Net_Migration_Rate, 0.25, na.rm = TRUE),
+    Youth_Unemployment_Q3 = quantile(Youth_Unemployment_Rate, 0.75, na.rm = TRUE)
+  )
+
+countries_in_top25_net_migration <- df_vars %>%
+  inner_join(continent_quartiles, by = "Continent") %>%
+  filter(
+    Net_Migration_Rate >= Net_Migration_Q1, 
+    Youth_Unemployment_Rate <= Youth_Unemployment_Q3 
+  ) %>%
+  select(Country)
+
+print(countries_in_top25_net_migration)
+```
+
 
 ### r.
 
@@ -82,4 +147,13 @@ missing values; no rownames should be included in the csv. Upload the .csv to
 TUWEL together with your .Rmd and .html (or .pdf).
 
 **Answer**
+```{r}
+write.table(
+  df_vars, 
+  file = "../data/final_data.csv", 
+  sep = ";", 
+  na = ".", 
+  row.names = FALSE
+  )
+```
 
