@@ -1,0 +1,111 @@
+```{r import_exercise1, message=FALSE, warning=FALSE, include=FALSE, echo=FALSE}
+
+import_library <- function(library_name) {
+  if (!requireNamespace(library_name, quietly = TRUE)) {
+    install.packages(library_name)
+  }
+  library(library_name, character.only = TRUE)
+}
+
+# --------------------------
+
+import_library("ggplot2")
+import_library("readr")
+import_library("dplyr")
+import_library("tidyr")
+import_library("tidyverse")
+import_library("knitr")
+
+```
+
+```{r path_determination_exercise1, include=FALSE}
+
+# Determine if it's running as a child or not
+# to fix paths when knitting
+if (requireNamespace("rstudioapi", quietly = TRUE)) {
+ script_path <- rstudioapi::getActiveDocumentContext()$path
+ 
+ if (endsWith(dirname(script_path), "exercises")) {
+   working_directory_path <- dirname(dirname(script_path))
+ } else {
+   working_directory_path <- dirname(script_path)
+ }
+ 
+} else {
+ message("RStudio API is not available")
+}
+
+```
+
+## a. Median age in different income levels
+
+Using ggplot2, create a density plot of the median age grouped by income status
+groups. The densities for the different groups are superimposed in the same plot
+rather than in different plots. Ensure that you order the levels of the income
+status such that in the plots the legend is ordered from High (H) to Low (L).
+
+ - The color of the density lines is black.
+ - The area under the density curve should be colored differently among 
+   the income status levels.
+ - For the colors, choose a transparency level of 0.5 for better visibility.
+ - Position the legend at the top center of the plot and give it no title 
+   (hint: use element_blank()).
+ - Rename the x axis as “Median age of population”
+
+Comment briefly on the plot.
+
+**Answer**
+
+```{r a1, dev=c('png')}
+
+```
+
+## b. Income status in different continents
+
+Investigate how the income status is distributed in the different continents.
+ 
+ - Using ggplot2, create a stacked barplot of absolute frequencies showing how 
+   the entities are split into continents and income status. Comment the plot.
+ - Create another stacked barplot of relative frequencies 
+   (height of the bars should be one). Comment the plot.
+ - Create a mosaic plot of continents and income status using base R functions.
+ - Briefly comment on the differences between the three plots generated 
+   to investigate the income
+
+distribution among the different continents.
+
+**Answer**
+
+## c. Income status in different subcontinents
+
+For Asia, investigate further how the income status distribution is in the 
+different subcontinents. Use one of the plots in b. for this purpose. 
+Comment on the results.
+
+**Answer**
+
+## d. Net migration in different continents
+
+ - Using ggplot2, create parallel boxplots showing the distribution of the net 
+   migration rate in the different continents.
+ - Prettify the plot (change y-, x-axis labels, etc).
+ - Identify which country in Asia constitutes the largest negative outlier 
+   and which country in Asia constitutes the largest positive outlier.
+ - Comment on the plot.
+
+**Answer**
+
+## e. Net migration in different subcontinents
+
+The graph in d. clearly does not convey the whole picture. 
+It would be interesting also to look at the subcontinents, as it is likely that 
+a lot of migration flows happen within the continent.
+
+ - Investigate the net migration in different subcontinents 
+  using again parallel boxplots. 
+  Group the boxplots by continent (hint: use facet_grid with scales = "free_x").
+ - Remember to prettify the plot (rotate axis labels if needed).
+ - Describe what you see.
+
+**Answer**
+

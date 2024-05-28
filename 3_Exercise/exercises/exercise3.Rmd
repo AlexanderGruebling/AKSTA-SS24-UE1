@@ -1,0 +1,99 @@
+```{r import_exercise3, message=FALSE, warning=FALSE, include=FALSE, echo=FALSE}
+
+import_library <- function(library_name) {
+  if (!requireNamespace(library_name, quietly = TRUE)) {
+    install.packages(library_name)
+  }
+  library(library_name, character.only = TRUE)
+}
+
+# --------------------------
+
+import_library("ggplot2")
+import_library("readr")
+import_library("dplyr")
+import_library("tidyr")
+import_library("tidyverse")
+import_library("knitr")
+import_library("plotly")
+
+```
+
+```{r path_determination_exercise3, include=FALSE}
+
+# Determine if it's running as a child or not
+# to fix paths when knitting
+if (requireNamespace("rstudioapi", quietly = TRUE)) {
+ script_path <- rstudioapi::getActiveDocumentContext()$path
+ 
+ if (endsWith(dirname(script_path), "exercises")) {
+   working_directory_path <- dirname(dirname(script_path))
+ } else {
+   working_directory_path <- dirname(script_path)
+ }
+ 
+} else {
+ message("RStudio API is not available")
+}
+
+```
+
+## k. Median net migration rate per subcontinent.
+
+Go online and find a data set which contains the 2020 population for the 
+countries of the world together with ISO codes.
+
+ - Download this data and merge it to the dataset you are working on in this 
+   case study using a left join. (A possible source: [World Bank ](https://data.worldbank.org/indicator/SP.POP.TOTL?end=2020&start=2020))
+ - Inspect the data and check whether the join worked well.
+
+**Answer**
+
+```{r k1, dev=c('png')}
+
+```
+
+## l. Scatterplot of median age and net migration rate in Europe
+
+Make a scatterplot of median age and net migration rate for the countries of Europe. 
+Scale the size of the points according to each country’s population.
+
+ - For better visibility, use a transparency of alpha=0.7.
+ - Remove the legend.
+ - Comment on the plot.
+
+**Answer**
+
+## m. Interactive plot
+
+On the merged data set from Task k., using function ggplotly from package plotly
+re-create the scatterplot in Task l., but this time for all countries. 
+Color the points according to their continent.
+
+When hovering over the points the name of the country, the values for median age, 
+net migration rate, and population should be shown. 
+(Hint: use the aesthetic text = Country. 
+In ggplotly use the argument tooltip = c("text", "x", "y", "size")).
+
+**Answer**
+
+## n. Parallel coordinate plot
+
+In parallel coordinate plots each observation or data point is depicted as a line 
+traversing a series of parallel axes, corresponding to a specific variable or dimension. 
+It is often used for identifying clusters in the data.
+
+One can create such a plot using the GGally R package. You should create such a 
+plot where you look at the three main variables in the data set: median age, 
+youth unemployment rate and net migration rate. 
+Color the lines based on the income status. Briefly comment.
+
+**Answer**
+
+## o. World map visualisation
+
+Using the package rworldmap, create a world map of the median age per country. 
+Use the [vignette](https://cran.r-project.org/web/packages/rworldmap/vignettes/rworldmap.pdf) to find how to do this in R.
+
+**Answer**
+

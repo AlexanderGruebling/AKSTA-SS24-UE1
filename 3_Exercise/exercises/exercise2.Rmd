@@ -1,0 +1,117 @@
+```{r import_exercise2, message=FALSE, warning=FALSE, include=FALSE, echo=FALSE}
+
+import_library <- function(library_name) {
+  if (!requireNamespace(library_name, quietly = TRUE)) {
+    install.packages(library_name)
+  }
+  library(library_name, character.only = TRUE)
+}
+
+# --------------------------
+
+import_library("ggplot2")
+import_library("readr")
+import_library("dplyr")
+import_library("tidyr")
+import_library("tidyverse")
+import_library("knitr")
+import_library("forcats")
+
+```
+
+```{r path_determination_exercise2, include=FALSE}
+
+# Determine if it's running as a child or not
+# to fix paths when knitting
+if (requireNamespace("rstudioapi", quietly = TRUE)) {
+ script_path <- rstudioapi::getActiveDocumentContext()$path
+ 
+ if (endsWith(dirname(script_path), "exercises")) {
+   working_directory_path <- dirname(dirname(script_path))
+ } else {
+   working_directory_path <- dirname(script_path)
+ }
+ 
+} else {
+ message("RStudio API is not available")
+}
+
+```
+
+## f. Median net migration rate per subcontinent.
+
+The plot in task e. shows the distribution of the net migration rate for each subcontinent. 
+Here you will work on visualizing only one summary statistic, namely the median.
+For each subcontinent, calculate the median net migration rate. Then create a plot which contains the
+sub-regions on the y-axis and the median net migration rate on the x-axis.
+
+ - As geoms use points.
+ - Color the points by continent – use a colorblind friendly palette 
+   (see e.g., [here](http://www.cookbook-r.com/Graphs/Colors_(ggplot2)).
+ - Rename the axes.
+ - Using fct_reorder from the forcats package, arrange the levels of subcontinent 
+   such that in the plot the lowest (bottom) subcontinent contains the lowest 
+   median net migration rate and the upper most region contains the highest median 
+   net migration rate.
+ - Comment on the plot. E.g., what are the regions with the most influx? 
+   What are the regions with the most outflux?
+
+**Answer**
+
+```{r f1, dev=c('png')}
+
+```
+
+## g. Median youth unemployment rate per subcontinent
+
+For each subcontinent, calculate the median youth unemployment rate. 
+Then create a plot which contains the sub-regions on the y-axis and the median 
+unemployment rate on the x-axis.
+
+ - Use a black and white theme (?theme_bw())
+ - As geoms use bars. (hint: pay attention to the statistical transformation 
+   taking place in geom_bar() – look into argument stat="identity")
+ - Color the bars by continent – use a colorblind friendly palette.
+ - Make the bars transparent (use alpha = 0.7).
+ - Rename the axes.
+ - Using fct_reorder from the forcats package, arrange the levels of subcontinent 
+   such that in the plot the lowest (bottom) subcontinent contains the lowest median 
+   youth unemployment rate and the upper most region contains the highest median 
+   youth unemployment rate.
+ - Comment on the plot. E.g., what are the regions with the highest vs lowest 
+   youth unemployment rate?
+
+**Answer**
+
+## h. Median youth unemployment rate per subcontinent – with error bars
+
+The value displayed in the barplot in g. is the result of an aggregation, 
+so it might be useful to also plot error bars, to have a general idea on how 
+precise the median unemployment is. This can be achieved by plotting the error 
+bars which reflect the standard deviation or the interquartile range of the 
+variable in each of the subcontinents.
+
+Repeat the plot in h. but include also error bars which reflect the 25% and 75% 
+quantiles. You can use geom_errorbar in ggplot2.
+
+**Answer**
+
+## i. Relationship between median age and net migration rate
+
+Using ggplot2, create a plot showing the relationship between 
+median age and net migration rate.
+
+ - Color the geoms based on the income status.
+ - Add a regression line for each development status (using geom_smooth()).
+
+Comment on the plot. Do you see any relationship between the two variables? D
+o you see any difference among the income levels?
+
+**Answer**
+
+## j. Relationship between youth unemployment and net migration rate
+
+Create a plot as in Task f. but for youth unemployment and net migration rate. 
+Comment briefly.
+
+**Answer**
