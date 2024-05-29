@@ -15,6 +15,8 @@ import_library("dplyr")
 import_library("tidyr")
 import_library("tidyverse")
 import_library("knitr")
+import_library("RColorBrewer")
+colorblind_palette <- brewer.pal(4, "Set2")
 
 ```
 
@@ -37,6 +39,39 @@ if (requireNamespace("rstudioapi", quietly = TRUE)) {
 
 ```
 
+```{r prepare_data_e1}
+
+data_tibble <- read_delim(file = paste0(working_directory_path, "/data/final_data.csv"),
+                          show_col_types = FALSE)
+
+data_tibble <- data_tibble %>% 
+  filter(Classification_2020 != ".")
+
+data_tibble <- data_tibble %>% 
+  mutate(Classification_2020 = factor(Classification_2020, 
+                                      levels = c("L", "LM", "UM", "H"), 
+                                      labels = c("Low", "Lower-middle", "Upper-middle", "High"), 
+                                      ordered = TRUE)
+  )
+
+data_tibble <- data_tibble %>%
+  mutate(
+    Continent = factor(Continent),
+    Region = factor(Region)
+  )
+
+data_tibble <- data_tibble %>%
+ mutate(
+    Net_Migration_Rate = na_if(Net_Migration_Rate, ".") %>% as.double(),
+    Median_Age = na_if(Median_Age, ".") %>% as.double(),
+    Youth_Unemployment_Rate = na_if(Youth_Unemployment_Rate, ".") %>% as.double()
+  )
+
+head(data_tibble)
+
+```
+
+
 ## a. Median age in different income levels
 
 Using ggplot2, create a density plot of the median age grouped by income status
@@ -58,7 +93,30 @@ Comment briefly on the plot.
 
 ```{r a1, dev=c('png')}
 
+# Filter out non-finite values in the Median_Age column
+filtered_data <- data_tibble %>%
+  filter(is.finite(Median_Age))
+
+# Create the density plot
+ggplot(filtered_data, aes(x = Median_Age, fill = Classification_2020)) +
+  geom_density(alpha = 0.5, color = "black") +
+  scale_fill_manual(values = colorblind_palette) +
+  labs(x = "Median age of population") +
+  theme_minimal() +
+  theme(legend.position = "top",
+        legend.title = element_blank(),
+        legend.text = element_text(size = 10),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12))
+
 ```
+
+The density plot reveals that low-income countries have predominantly younger
+populations, peaking around the 20-25 age range. As income status increases, the
+median age of populations also increases, with high-income countries showing the
+oldest populations, peaking around 40-45 years. This indicates a trend where
+higher-income countries tend to have older populations, while lower-income
+countries have younger populations.
 
 ## b. Income status in different continents
 
@@ -70,11 +128,74 @@ Investigate how the income status is distributed in the different continents.
    (height of the bars should be one). Comment the plot.
  - Create a mosaic plot of continents and income status using base R functions.
  - Briefly comment on the differences between the three plots generated 
-   to investigate the income
-
-distribution among the different continents.
+   to investigate the income distribution among the different continents.
 
 **Answer**
+
+```{r b1, dev=c('png')}
+
+# Create stacked barplot of absolute frequencies
+ggplot(data_tibble, aes(x = Continent, fill = Classification_2020)) +
+  geom_bar(position = "stack") +
+  scale_fill_manual(values = colorblind_palette) +
+  labs(x = "Continent", y = "Count", fill = "Income Status") +
+  theme_minimal() +
+  theme(legend.position = "top",
+        legend.title = element_blank(),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12))
+
+```
+
+The absolute frequencies plot shows that Africa predominantly consists of low
+and lower-middle-income countries, reflecting its economic challenges, while
+Europe and North America are mostly high-income, indicating advanced economic
+development. Asia displays a diverse economic landscape with significant
+representation across all income categories. Oceania and South America show a
+mix of income levels, highlighting varying development within these regions.
+
+```{r b2, dev=c('png')}
+
+# Create stacked barplot of relative frequencies
+ggplot(data_tibble, aes(x = Continent, fill = Classification_2020)) +
+  geom_bar(position = "fill") +
+  scale_fill_manual(values = colorblind_palette) +
+  labs(x = "Continent", y = "Proportion", fill = "Income Status") +
+  scale_y_continuous(labels = scales::percent) +
+  theme_minimal() +
+  theme(legend.position = "top",
+        legend.title = element_blank(),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12))
+
+```
+
+The relative frequencies plot makes it easier to compare the proportion of
+income statuses within each continent but obscures the actual number of
+countries. In contrast, the absolute frequencies plot clearly shows the total
+count of countries in each income status category, making it easier to see the
+magnitude but harder to compare proportions within continents. Thus, the
+relative plot is better for internal distribution comparison, while the absolute
+plot is better for understanding total counts.
+
+```{r b3, dev=c('png')}
+
+# Create mosaic plot
+mosaicplot(~ Continent + Classification_2020, 
+           data = data_tibble, 
+           color = colorblind_palette,
+           main = "Mosaic Plot of Continents and Income Status",
+           xlab = "Continent", 
+           ylab = "Income Status")
+
+```
+
+The mosaic plot combines the strengths of both the relative and absolute
+frequency plots by showing both the proportions and the total counts of income
+statuses within each continent. It uses tile sizes to represent absolute counts
+and tile areas to reflect relative proportions, providing a comprehensive view
+of the data. This allows for easy comparison of both the distribution balance
+within continents and the magnitude of each category.
 
 ## c. Income status in different subcontinents
 
@@ -83,6 +204,33 @@ different subcontinents. Use one of the plots in b. for this purpose.
 Comment on the results.
 
 **Answer**
+
+```{r c1, dev=c('png')}
+
+# Filter data to include only Asia
+asia_data <- data_tibble %>%
+  filter(Continent == "Asia")
+
+# Create stacked barplot of absolute frequencies for Asian subcontinents
+ggplot(asia_data, aes(x = Region, fill = Classification_2020)) +
+  geom_bar(position = "stack") +
+  scale_fill_manual(values = colorblind_palette) +
+  labs(x = "Subcontinent", y = "Count", fill = "Income Status") +
+  theme_minimal() +
+  theme(legend.position = "top",
+        legend.title = element_blank(),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12))
+
+```
+
+The absolute stacked barplot reveals that Western Asia has the highest diversity
+in income statuses, with significant representation in all categories, including
+a notable portion in the high-income category. Eastern Asia shows a strong
+presence of high-income and upper-middle-income countries, reflecting its
+economic development. Central Asia, South-eastern Asia, and Southern Asia are
+predominantly lower-middle-income regions, indicating more uniform economic
+status within these subcontinents.
 
 ## d. Net migration in different continents
 
@@ -95,6 +243,72 @@ Comment on the results.
 
 **Answer**
 
+```{r d1, dev=c('png')}
+
+# Filter out non-finite values
+filtered_data <- data_tibble %>%
+  filter(is.finite(Net_Migration_Rate))
+
+# Create parallel boxplots
+ggplot(filtered_data, aes(x = Continent, y = Net_Migration_Rate)) +
+  geom_boxplot(outlier.colour = "red", outlier.shape = 8, outlier.size = 2) +
+  labs(x = "Continent", y = "Net Migration Rate") +
+  ggtitle("Distribution of Net Migration Rate by Continent") +
+  theme_minimal() +
+  theme(axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12),
+        plot.title = element_text(size = 14, face = "bold", hjust = 0.5))
+
+# Create parallel boxplots again, 
+# but hide the extreme negative outlier
+ggplot(filtered_data, aes(x = Continent, y = Net_Migration_Rate)) +
+  geom_boxplot(outlier.colour = "red", outlier.shape = 8, outlier.size = 2) +
+  labs(x = "Continent", y = "Net Migration Rate") +
+  ggtitle("Distribution of Net Migration Rate by Continent\n(excl. Lebanon)") +
+  coord_cartesian(ylim = c(-30, 30)) +
+  theme_minimal() +
+  theme(axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12),
+        plot.title = element_text(size = 14, face = "bold", hjust = 0.5))
+
+
+```
+
+To facilitate the evaluation of the plot, Lebanon was removed in the second
+analysis because its extremely low net migration rate skewed the scale, making
+the data from the other continents harder to discern.
+
+The boxplot shows net migration rate distributions across continents, excluding
+extreme negative outliers. Asia and Africa have the most variation, with many
+outliers, indicating diverse migration dynamics. This suggests different
+countries experience varying economic, political, and social conditions. Europe,
+North America, and Oceania have more centralized distributions with fewer
+outliers, reflecting stable migration trends due to established economic
+conditions and policies. South America shows a narrower range and fewer extreme
+values, indicating more uniform migration trends within the continent.
+
+
+```{r d2, dev=c('png')}
+
+# Filter data for Asia and remove non-finite values
+asia_data <- data_tibble %>%
+  filter(Continent == "Asia" & is.finite(Net_Migration_Rate))
+
+# Identify the largest negative and positive outliers in Asia
+largest_negative_outlier <- asia_data %>%
+  filter(Net_Migration_Rate == min(Net_Migration_Rate, na.rm = TRUE)) %>%
+  select(Country, Net_Migration_Rate)
+
+largest_positive_outlier <- asia_data %>%
+  filter(Net_Migration_Rate == max(Net_Migration_Rate, na.rm = TRUE)) %>%
+  select(Country, Net_Migration_Rate)
+
+# Display the results
+print(largest_negative_outlier)
+print(largest_positive_outlier)
+
+```
+
 ## e. Net migration in different subcontinents
 
 The graph in d. clearly does not convey the whole picture. 
@@ -102,10 +316,36 @@ It would be interesting also to look at the subcontinents, as it is likely that
 a lot of migration flows happen within the continent.
 
  - Investigate the net migration in different subcontinents 
-  using again parallel boxplots. 
-  Group the boxplots by continent (hint: use facet_grid with scales = "free_x").
+   using again parallel boxplots. 
+   Group the boxplots by continent (hint: use facet_grid with scales = "free_x").
  - Remember to prettify the plot (rotate axis labels if needed).
  - Describe what you see.
 
 **Answer**
 
+```{r b1, dev=c('png')}
+
+# Filter out non-finite values
+filtered_data <- data_tibble %>%
+  filter(is.finite(Net_Migration_Rate))
+
+# Create parallel boxplots grouped by continent
+ggplot(filtered_data, aes(x = Region, y = Net_Migration_Rate)) +
+  geom_boxplot(outlier.colour = "red", outlier.shape = 8, outlier.size = 2) +
+  labs(x = "Subcontinent", y = "Net Migration Rate") +
+  ggtitle("Distribution of Net Migration Rate by Subcontinent") +
+  coord_cartesian(ylim = c(-30, 30)) +
+  facet_grid(. ~ Continent, scales = "free_x") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12),
+        plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+        strip.text.x = element_text(size = 12, face = "bold"))
+
+```
+
+When splitting continents into subcontinents, the detailed breakdown reveals
+significant regional variations within each continent that are not visible in
+the broader view. Subcontinent-specific migration patterns and outliers become
+apparent, such as the distinct differences between Central and Western Asia or
+among the subregions of Africa.

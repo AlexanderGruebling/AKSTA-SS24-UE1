@@ -38,6 +38,38 @@ if (requireNamespace("rstudioapi", quietly = TRUE)) {
 
 ```
 
+```{r prepare_data_e3, include=FALSE}
+
+data_tibble <- read_delim(file = paste0(working_directory_path, "/data/final_data.csv"),
+                          show_col_types = FALSE)
+
+data_tibble <- data_tibble %>% 
+  filter(Classification_2020 != ".")
+
+data_tibble <- data_tibble %>% 
+  mutate(Classification_2020 = factor(Classification_2020, 
+                                      levels = c("L", "LM", "UM", "H"), 
+                                      labels = c("Low", "Lower-middle", "Upper-middle", "High"), 
+                                      ordered = TRUE)
+  )
+
+data_tibble <- data_tibble %>%
+  mutate(
+    Continent = factor(Continent),
+    Region = factor(Region)
+  )
+
+data_tibble <- data_tibble %>%
+ mutate(
+    Net_Migration_Rate = na_if(Net_Migration_Rate, ".") %>% as.double(),
+    Median_Age = na_if(Median_Age, ".") %>% as.double(),
+    Youth_Unemployment_Rate = na_if(Youth_Unemployment_Rate, ".") %>% as.double()
+  )
+
+head(data_tibble)
+
+```
+
 ## k. Median net migration rate per subcontinent.
 
 Go online and find a data set which contains the 2020 population for the 
