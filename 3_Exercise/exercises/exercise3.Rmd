@@ -16,6 +16,8 @@ import_library("tidyr")
 import_library("tidyverse")
 import_library("knitr")
 import_library("plotly")
+import_library("GGally")
+import_library("rworldmap")
 
 ```
 
@@ -67,7 +69,6 @@ data_tibble <- data_tibble %>%
   )
 
 head(data_tibble)
-
 ```
 
 ## k. Median net migration rate per subcontinent.
@@ -79,11 +80,15 @@ countries of the world together with ISO codes.
    case study using a left join. (A possible source: [World Bank ](https://data.worldbank.org/indicator/SP.POP.TOTL?end=2020&start=2020))
  - Inspect the data and check whether the join worked well.
 
-**Answer**
-
 ```{r k1, dev=c('png')}
-
+pop_data <- read.csv("../data/country_population_data.csv")
+pop_data <- pop_data[c("Country.Code", "X2020")]
+colnames(pop_data) <- c("ISO", "Population_2020")
+full_data <- left_join(data_tibble, pop_data)
+head(full_data)
 ```
+For the most part the join worked pretty well, I chose to use the "left_join" so that countries that are not in the original data but are in the population data will be ignored (else this would lead to rows where most of the values are N/A). Only 2 problems occured during the merge: For Kosovo, the original dataset had XKS as the ISO code, while the population set had "XKX" - this was easily corrected by changing the country code in the population data. For Taiwan, no population data was available on the "World Bank"-Site, since it is taken as a part of china $\rightarrow$ no data is available for just Taiwan alone.
+
 
 ## l. Scatterplot of median age and net migration rate in Europe
 
@@ -94,7 +99,12 @@ Scale the size of the points according to each country’s population.
  - Remove the legend.
  - Comment on the plot.
 
-**Answer**
+```{r l1, dev=c('png')}
+scatterplot_data <- full_data %>% filter(Continent=="Europe")
+ggplot(scatterplot_data) + aes(x=Median_Age, y=Net_Migration_Rate, size=Population_2020, alpha=0.7, color=Country) + geom_point() + theme(legend.position = "none") + ggtitle("Median age vs. Migration Rate in Europe")
+```
+
+The median age of most European countries is above 40 years. There also doesn't seem to be any visible relation between the net migration rate and the median age, most of the datapoints are concentrated in a "blob" in the middle.
 
 ## m. Interactive plot
 
@@ -107,7 +117,12 @@ net migration rate, and population should be shown.
 (Hint: use the aesthetic text = Country. 
 In ggplotly use the argument tooltip = c("text", "x", "y", "size")).
 
-**Answer**
+```{r m1, dev=c('png')}
+p <- ggplot(full_data) + aes(x=Median_Age, y=Net_Migration_Rate, size=Population_2020, alpha=0.7, color=Continent, text=Country) + geom_point() + theme(legend.position = "none") + ggtitle("Median age vs. Migration Rate, Worldwide")
+pltly <- ggplotly(p, tooltip=c("text", "x", "y", "size"))
+pltly
+```
+
 
 ## n. Parallel coordinate plot
 
@@ -120,12 +135,21 @@ plot where you look at the three main variables in the data set: median age,
 youth unemployment rate and net migration rate. 
 Color the lines based on the income status. Briefly comment.
 
-**Answer**
+```{r n1, dev=c('png')}
+library(GGally)
+ggparcoord(data=full_data, columns=c(1:3), groupColumn="Classification_2020", title="Income-Class to Data Comparison, Worldwide")
+```
+
+The net migration rate and median rate seem to move up as the income-class rises for each country, while the youth unemployment-rate is more spread evenly between these classes (however most of the high-income countries still seem to have a pretty low youth unemployment rate.)
 
 ## o. World map visualisation
 
 Using the package rworldmap, create a world map of the median age per country. 
 Use the [vignette](https://cran.r-project.org/web/packages/rworldmap/vignettes/rworldmap.pdf) to find how to do this in R.
 
-**Answer**
-
+```{r o1, dev=c('png')}
+library(rworldmap)
+cdatamap <- joinCountryData2Map(full_data, joinCode = "ISO3", nameJoinColumn = "ISO")
+par(mai=c(0,0,0.2,0),xaxs="i",yaxs="i")
+mapCountryData(cdatamap, nameColumnToPlot = "Median_Age")
+```

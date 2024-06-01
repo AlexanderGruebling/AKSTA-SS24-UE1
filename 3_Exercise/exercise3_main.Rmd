@@ -3,7 +3,7 @@ title: "Case Study 3"
 subtitle: "AKSTA Statistical Computing"
 author: "Tatzberger Jonas, Rasser Thomas, Grübling Alexander"
 date: "28.05.2024"
-output: pdf_document
+output: html_document
 ---
 
 # Exercises

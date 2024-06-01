@@ -323,7 +323,7 @@ a lot of migration flows happen within the continent.
 
 **Answer**
 
-```{r b1, dev=c('png')}
+```{r e1, dev=c('png')}
 
 # Filter out non-finite values
 filtered_data <- data_tibble %>%
