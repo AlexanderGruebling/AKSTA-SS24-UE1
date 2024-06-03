@@ -91,8 +91,29 @@ sub-regions on the y-axis and the median net migration rate on the x-axis.
 **Answer**
 
 ```{r f1, dev=c('png')}
+data_tibble <- data_tibble %>% filter(!is.na(Youth_Unemployment_Rate))
+median_migration <- data_tibble %>%
+  group_by(Region, Continent) %>%
+  summarize(median_net_migration_rate = median(Net_Migration_Rate)) %>%
+  ungroup()
 
+median_migration <- median_migration %>%
+  mutate(Region = fct_reorder(Region, median_net_migration_rate, .na_rm = TRUE))
+
+ggplot(median_migration, aes(x = median_net_migration_rate, y = Region, color = Continent)) +
+  geom_point(size = 4, na.rm = TRUE) +
+  scale_color_brewer(palette = "Set2") +
+  labs(
+    x = "Median Net Migration Rate",
+    y = "Subcontinent",
+    title = "Median Net Migration Rate by Subcontinent",
+    color = "Continent"
+  ) +
+  theme_minimal() +
+  theme(axis.text.y = element_text(size = 10))
 ```
+
+This plot shows that eastern regions like Central Asia, Polynesia and Micronesia show the most outflux, with the latter islands even more seperated from the pack. Most African regions show a balanced net migration rate. North America, large parts of Europe and Australia are the continents with the largest influx, with Australia heavily dominating this statistic. Given the geographic proximity of Australia and Micronesia and Polynesia, it seems likely that a large amount of the outflux of the latter migrate to Australia and thus explain the median net migration rates of both these regions.
 
 ## g. Median youth unemployment rate per subcontinent
 
@@ -114,6 +135,29 @@ unemployment rate on the x-axis.
    youth unemployment rate?
 
 **Answer**
+```{r}
+median_unemployment <- data_tibble %>%
+  group_by(Region, Continent) %>%
+  summarize(median_youth_unemployment_rate = median(Youth_Unemployment_Rate)) %>%
+  ungroup()
+
+median_unemployment <- median_unemployment %>%
+  mutate(region = fct_reorder(Region, median_youth_unemployment_rate))
+
+ggplot(median_unemployment, aes(x = median_youth_unemployment_rate, y = region, fill = Continent)) +
+  geom_bar(stat = "identity", alpha = 0.7) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    x = "Median Youth Unemployment Rate",
+    y = "Subcontinent",
+    title = "Median Youth Unemployment Rate by Subcontinent",
+    fill = "Continent"
+  ) +
+  theme_bw() +
+  theme(axis.text.y = element_text(size = 10))
+```
+
+Youth unemployment is most prevalent in Southern and Northern Africa, but also in Polynesia and Southern Europe. Generally, Asia and Europe score rather low on Youth unemployment, with southern regions tending to perform worse for almost all continents. Interestingly enough, even though most regions of Africa have rather high values, Western Africa belongs to the top performers regarding Youth unemployment.
 
 ## h. Median youth unemployment rate per subcontinent – with error bars
 
@@ -127,6 +171,33 @@ Repeat the plot in h. but include also error bars which reflect the 25% and 75%
 quantiles. You can use geom_errorbar in ggplot2.
 
 **Answer**
+```{r}
+quantiles_unemployment <- data_tibble %>%
+  group_by(Region, Continent) %>%
+  summarize(
+    median_youth_unemployment_rate = median(Youth_Unemployment_Rate),
+    q25 = quantile(Youth_Unemployment_Rate, 0.25),
+    q75 = quantile(Youth_Unemployment_Rate, 0.75)
+  ) %>%
+  ungroup()
+
+quantiles_unemployment <- quantiles_unemployment %>%
+  mutate(region = fct_reorder(Region, median_youth_unemployment_rate))
+
+ggplot(quantiles_unemployment, aes(x = median_youth_unemployment_rate, y = region, fill = Continent)) +
+  geom_bar(stat = "identity", alpha = 0.7) +
+  geom_errorbar(aes(xmin = q25, xmax = q75), width = 0.2) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    x = "Median Youth Unemployment Rate",
+    y = "Subcontinent",
+    title = "Median Youth Unemployment Rate by Subcontinent with Error Bars",
+    fill = "Continent"
+  ) +
+  theme_bw() +
+  theme(axis.text.y = element_text(size = 10))
+```
+
 
 ## i. Relationship between median age and net migration rate
 
@@ -136,10 +207,26 @@ median age and net migration rate.
  - Color the geoms based on the income status.
  - Add a regression line for each development status (using geom_smooth()).
 
-Comment on the plot. Do you see any relationship between the two variables? D
-o you see any difference among the income levels?
+Comment on the plot. Do you see any relationship between the two variables? Do 
+you see any difference among the income levels?
 
 **Answer**
+```{r}
+ggplot(data_tibble, aes(x = Median_Age, y = Net_Migration_Rate, color = Classification_2020)) +
+  geom_point(size = 3, alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(
+    x = "Median Age",
+    y = "Net Migration Rate",
+    title = "Relationship between Median Age and Net Migration Rate",
+    color = "Income Status"
+  ) +
+  theme_minimal() +
+  theme(axis.text = element_text(size = 10))
+
+```
+
+The most eye-catching regression can be observed for the Low Income Status group. However, this regression line is clearly heavily influenced by an outlier at the top of the graph. Using a robust regression function could be benefitial here. All other income status classes feature a similar behaviour, with their respective regression lines being almost parallel.
 
 ## j. Relationship between youth unemployment and net migration rate
 
@@ -147,3 +234,18 @@ Create a plot as in Task f. but for youth unemployment and net migration rate.
 Comment briefly.
 
 **Answer**
+```{r}
+ggplot(data_tibble, aes(x = Youth_Unemployment_Rate, y = Net_Migration_Rate, color = Classification_2020)) +
+  geom_point(size = 3, alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(
+    x = "Youth Unemployment Rate",
+    y = "Net Migration Rate",
+    title = "Relationship between Youth Unemployment Rate and Net Migration Rate",
+    color = "Income Status"
+  ) +
+  theme_minimal() +
+  theme(axis.text = element_text(size = 10))
+```
+
+Here, different trends are visible for the low income status group compared with the other ones. For the low income group, a higher youth unemployment rate correlates with a higher net migration rate. The other income status groups tend to the opposite, with higher youth unemployment rates correlating with lower net migration rates.
