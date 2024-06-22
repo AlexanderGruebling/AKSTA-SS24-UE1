@@ -1,29 +1,140 @@
 ---
-title: "Case Study 1"
+title: "Case Study 4"
 subtitle: "AKSTA Statistical Computing"
 author: "Tatzberger Jonas, Rasser Thomas, Grübling Alexander"
-date: "03.04.2024"
+date: "22.06.2024"
 output: pdf_document
 ---
 
 # Exercises
 
-```{r, child="exercises/exercise1.Rmd"}
+```{r import_libraries, message=FALSE, warning=FALSE, include=FALSE, echo=FALSE}
+
+import_library <- function(library_name) {
+  if (!requireNamespace(library_name, quietly = TRUE)) {
+    install.packages(library_name)
+  }
+  library(library_name, character.only = TRUE)
+}
+
+# --------------------------
+
+import_library("shiny")
+import_library("shinydashboard")
+import_library("shinyalert")
+# import_library("DT")
+
+import_library("ggplot2")
+import_library("plotly")
+import_library("readr")
+import_library("dplyr")
+import_library("tidyr")
+import_library("knitr")
+
+import_library("RColorBrewer")
+colorblind_palette <- brewer.pal(4, "Set2")
+
 ```
 
-```{r, child="exercises/exercise2.Rmd"}
+```{r}
+
+cia_data <- jsonlite::read_json("data/data_cia.json")
+cia_data_tibble <- purrr::map_df(cia_data, tibble::as_tibble)
+
+# Rename columns, to make it simpler to show them in the shiny app without parsing
+cia_data_tibble <- cia_data_tibble %>%
+  rename(
+    "Country" = country,
+    "ISO3" = ISO3,
+    "Continent" = continent,
+    "Subcontinent" = subcontinent,
+    "Status" = status,
+    "Median age" = median_age,
+    "Youth unemployment rate" = youth_unempl_rate,
+    "Net migration rate" = net_migr_rate,
+    "Electricity from fossil fuel" = electricity_fossil_fuel,
+    "Area" = area,
+    "Population growth rate" = pop_growth_rate,
+    "Life exppectancy" = life_expectancy,
+    "Population" = population,
+  )
+
+glimpse(cia_data_tibble)
+
 ```
 
-```{r, child="exercises/exercise3.Rmd"}
-```
+```{r }
 
-```{r, child="exercises/exercise4.Rmd"}
-```
+# Define UI
+# ---------------------------------------------------------------------------
+ui <- fluidPage(
+  tabsetPanel(
+    tabPanel("Univariate analysis",
+      sidebarLayout(
+        sidebarPanel(
+          fluidRow(
+            box(
+              selectInput("variable", "Select a variable:",
+                         choices = c("Median age",
+                                     "Youth unemployment rate",
+                                     "Net migration rate",
+                                     "Population growth rate",
+                                     "Electricity fossil fuel",
+                                     "Life expectancy")),
+              actionButton("viewData", "View Raw Data"),
+              DTOutput("dataTable")
+            )
+          ),
+        ),
+        mainPanel(
+          tabsetPanel(
+            tabPanel("Map",
+              plotlyOutput("worldMap")
+            ),
+            tabPanel("Boxplott (overall)"
+              
+            ),
+            tabPanel("Boxplott per continent"
+              
+            ),
+          )
+        )
+      )
+    ),
+    tabPanel("Multivariate analysis")
+  )
+)
 
-```{r, child="exercises/exercise5.Rmd"}
-```
 
-```{r, child="exercises/exercise6.Rmd"}
+# Define Server
+# ---------------------------------------------------------------------------
+server <- function(input, output, session) {
+  
+  # TODO: uncomment
+  # shinyalert(title = "Welcome", 
+  #            text = "This app allows you to visualize various plots from the cia database", 
+  #            type = "info", 
+  #            closeOnClickOutside = TRUE
+  # )
+  
+  # Render the basic data table
+  output$dataTable <- renderDT({
+    req(input$viewData)
+    isolate({
+      datatable(cia_data_tibble[, c("Country", "Continent", input$variable)], 
+                options = list(pageLength = 15))
+    })
+  }, server = FALSE)
+  
+  # Render world map
+  # TODO
+  
+}
+
+# Run the application
+# ---------------------------------------------------------------------------
+shinyApp(ui = ui, server = server)
+
 ```
 
 </div>
