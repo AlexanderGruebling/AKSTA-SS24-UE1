@@ -47,7 +47,7 @@ colorblind_palette <- brewer.pal(4, "Set2")
 cia_data <- jsonlite::read_json("data/data_cia.json")
 cia_data_tibble <- purrr::map_df(cia_data, tibble::as_tibble)
 
-# Rename columns, to make it simpler to show them in the shiny app without parsing
+# Rename columns into more legidible names
 cia_data_tibble <- cia_data_tibble %>%
   rename(
     "Country" = country,
@@ -63,6 +63,13 @@ cia_data_tibble <- cia_data_tibble %>%
     "Population_growth_rate" = pop_growth_rate,
     "Life_expectancy" = life_expectancy,
     "Population" = population,
+  )
+
+# Update Continent and Subcontinent for Kosovo
+cia_data_tibble <- cia_data_tibble %>%
+  mutate(
+    Continent = if_else(Country == "Kosovo", "Europe", Continent),
+    Subcontinent = if_else(Country == "Kosovo", "Balkan Peninsula", Subcontinent)
   )
 
 # Load natural earth data for countries
@@ -108,12 +115,12 @@ ui <- fluidPage(
                         for the visualized variable."),
                plotlyOutput("worldMap")
             ),
-            tabPanel("Boxplott (overall)"
-              
+            tabPanel("Boxplot (overall)",
+              plotlyOutput("overallBoxplot")
             ),
-            tabPanel("Boxplott per continent"
-              
-            ),
+            tabPanel("Boxplot per continent",
+              plotlyOutput("continentBoxplot")
+            )
           )
         )
       )
@@ -127,7 +134,7 @@ ui <- fluidPage(
 # ---------------------------------------------------------------------------
 server <- function(input, output, session) {
   
-  # TODO: uncomment
+  # TODO: uncomment after testing
   # shinyalert(title = "Welcome", 
   #            text = "This app allows you to visualize various plots from the cia database", 
   #            type = "info", 
@@ -148,7 +155,6 @@ server <- function(input, output, session) {
     req(input$variable) # Ensure a variable is selected
     world <- ne_countries(scale = "medium", returnclass = "sf")
     
-    # Since your input$variable will be a column name with spaces, use backticks around it
     # Prepare the column name to include in the aes_string
     variable_name <- sprintf("`%s`", input$variable)
     
@@ -169,6 +175,41 @@ server <- function(input, output, session) {
     # Convert to plotly for interactivity
     ggplotly(p, tooltip = c("text"))
   })
+  
+  # Render Overall Boxplot
+  output$overallBoxplot <- renderPlotly({
+    req(input$variable)  # Ensure a variable is selected
+    
+    # Prepare the column name to include in the aes_string
+    variable_name <- sprintf("`%s`", input$variable)
+  
+    # Creating the boxplot using ggplot
+    p <- ggplot(cia_data_tibble, aes_string(y = variable_name)) +
+      geom_boxplot() +
+      labs(y = input$variable) +
+      theme_minimal()
+    
+    # Convert to Plotly for interactivity
+    ggplotly(p)
+  })
+  
+  # Render Boxplot per Continent
+  output$continentBoxplot <- renderPlotly({
+    req(input$variable)  # Ensure a variable is selected
+    # Prepare the column name to include in the aes_string
+    variable_name <- sprintf("`%s`", input$variable)
+  
+    # Creating the boxplot using ggplot grouped by continent
+    p <- ggplot(cia_data_tibble, aes_string(x = "Continent", y = variable_name, fill = "Continent")) +
+      geom_boxplot() +
+      labs(y = input$variable) +
+      theme_minimal() +
+      theme(legend.position = "none")
+    
+    # Convert to Plotly for interactivity
+    ggplotly(p)
+  })
+
 }
 
 # Run the application
