@@ -22,7 +22,7 @@ import_library <- function(library_name) {
 import_library("shiny")
 import_library("shinydashboard")
 import_library("shinyalert")
-# import_library("DT")
+import_library("DT")
 
 import_library("ggplot2")
 import_library("plotly")
@@ -31,6 +31,11 @@ import_library("dplyr")
 import_library("tidyr")
 import_library("knitr")
 
+import_library("viridis")
+import_library("rlang")    # For sym() and !! 
+import_library("rnaturalearth")
+import_library("rnaturalearthdata")
+
 import_library("RColorBrewer")
 colorblind_palette <- brewer.pal(4, "Set2")
 
@@ -38,6 +43,7 @@ colorblind_palette <- brewer.pal(4, "Set2")
 
 ```{r}
 
+# Load CIA data and turn it into a tibble
 cia_data <- jsonlite::read_json("data/data_cia.json")
 cia_data_tibble <- purrr::map_df(cia_data, tibble::as_tibble)
 
@@ -49,15 +55,23 @@ cia_data_tibble <- cia_data_tibble %>%
     "Continent" = continent,
     "Subcontinent" = subcontinent,
     "Status" = status,
-    "Median age" = median_age,
-    "Youth unemployment rate" = youth_unempl_rate,
-    "Net migration rate" = net_migr_rate,
-    "Electricity from fossil fuel" = electricity_fossil_fuel,
+    "Median_age" = median_age,
+    "Youth_unemployment_rate" = youth_unempl_rate,
+    "Net_migration_rate" = net_migr_rate,
+    "Electricity_from_fossil_fuel" = electricity_fossil_fuel,
     "Area" = area,
-    "Population growth rate" = pop_growth_rate,
-    "Life exppectancy" = life_expectancy,
+    "Population_growth_rate" = pop_growth_rate,
+    "Life_expectancy" = life_expectancy,
     "Population" = population,
   )
+
+# Load natural earth data for countries
+world <- ne_countries(scale = "medium", returnclass = "sf")
+
+# Merge your data with the world data
+world_data <- world %>%
+  left_join(cia_data_tibble, by = c("iso_a3" = "ISO3"))
+
 
 glimpse(cia_data_tibble)
 
@@ -75,12 +89,12 @@ ui <- fluidPage(
           fluidRow(
             box(
               selectInput("variable", "Select a variable:",
-                         choices = c("Median age",
-                                     "Youth unemployment rate",
-                                     "Net migration rate",
-                                     "Population growth rate",
-                                     "Electricity fossil fuel",
-                                     "Life expectancy")),
+                         choices = c("Median age"                   = "Median_age",
+                                     "Youth unemployment rate"      = "Youth_unemployment_rate",
+                                     "Net migration rate"           = "Net_migration_rate",
+                                     "Population growth rate"       = "Population_growth_rate",
+                                     "Electricity from fossil fuel" = "Electricity_from_fossil_fuel",
+                                     "Life expectancy"              = "Life_expectancy")),
               actionButton("viewData", "View Raw Data"),
               DTOutput("dataTable")
             )
@@ -89,7 +103,10 @@ ui <- fluidPage(
         mainPanel(
           tabsetPanel(
             tabPanel("Map",
-              plotlyOutput("worldMap")
+               helpText("The map contains values of the selected variables. 
+                        The countries with gray areas have a missing value 
+                        for the visualized variable."),
+               plotlyOutput("worldMap")
             ),
             tabPanel("Boxplott (overall)"
               
@@ -127,8 +144,31 @@ server <- function(input, output, session) {
   }, server = FALSE)
   
   # Render world map
-  # TODO
-  
+  output$worldMap <- renderPlotly({
+    req(input$variable) # Ensure a variable is selected
+    world <- ne_countries(scale = "medium", returnclass = "sf")
+    
+    # Since your input$variable will be a column name with spaces, use backticks around it
+    # Prepare the column name to include in the aes_string
+    variable_name <- sprintf("`%s`", input$variable)
+    
+    world_data <- left_join(world, cia_data_tibble, by = c("iso_a3" = "ISO3"))
+    
+    # Create the ggplot object
+    p <- ggplot(data = world_data) +
+     geom_sf(aes_string(fill = variable_name, 
+                        geometry = "geometry",
+                        group = 1,
+                        text = sprintf("paste(iso_a3, ': ', %s)", variable_name)
+                       ), 
+             color = "white") +
+     scale_fill_viridis_c(option = "viridis", name = input$variable) +
+     theme_minimal() +
+     theme(legend.position = "bottom")
+    
+    # Convert to plotly for interactivity
+    ggplotly(p, tooltip = c("text"))
+  })
 }
 
 # Run the application
