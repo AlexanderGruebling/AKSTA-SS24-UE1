@@ -1,0 +1,364 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Case Study 4},
+  pdfauthor={Tatzberger Jonas, Rasser Thomas, Grübling Alexander},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Case Study 4}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{AKSTA Statistical Computing}
+\author{Tatzberger Jonas, Rasser Thomas, Grübling Alexander}
+\date{22.06.2024}
+
+\begin{document}
+\maketitle
+
+\section{Exercises}\label{exercises}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Load CIA data and turn it into a tibble}
+\NormalTok{cia\_data }\OtherTok{\textless{}{-}}\NormalTok{ jsonlite}\SpecialCharTok{::}\FunctionTok{read\_json}\NormalTok{(}\StringTok{"data/data\_cia.json"}\NormalTok{)}
+\NormalTok{cia\_data\_tibble }\OtherTok{\textless{}{-}}\NormalTok{ purrr}\SpecialCharTok{::}\FunctionTok{map\_df}\NormalTok{(cia\_data, tibble}\SpecialCharTok{::}\NormalTok{as\_tibble)}
+
+\CommentTok{\# Rename columns into more legidible names}
+\NormalTok{cia\_data\_tibble }\OtherTok{\textless{}{-}}\NormalTok{ cia\_data\_tibble }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{rename}\NormalTok{(}
+    \StringTok{"Country"} \OtherTok{=}\NormalTok{ country,}
+    \StringTok{"ISO3"} \OtherTok{=}\NormalTok{ ISO3,}
+    \StringTok{"Continent"} \OtherTok{=}\NormalTok{ continent,}
+    \StringTok{"Subcontinent"} \OtherTok{=}\NormalTok{ subcontinent,}
+    \StringTok{"Status"} \OtherTok{=}\NormalTok{ status,}
+    \StringTok{"Median\_age"} \OtherTok{=}\NormalTok{ median\_age,}
+    \StringTok{"Youth\_unemployment\_rate"} \OtherTok{=}\NormalTok{ youth\_unempl\_rate,}
+    \StringTok{"Net\_migration\_rate"} \OtherTok{=}\NormalTok{ net\_migr\_rate,}
+    \StringTok{"Electricity\_from\_fossil\_fuel"} \OtherTok{=}\NormalTok{ electricity\_fossil\_fuel,}
+    \StringTok{"Area"} \OtherTok{=}\NormalTok{ area,}
+    \StringTok{"Population\_growth\_rate"} \OtherTok{=}\NormalTok{ pop\_growth\_rate,}
+    \StringTok{"Life\_expectancy"} \OtherTok{=}\NormalTok{ life\_expectancy,}
+    \StringTok{"Population"} \OtherTok{=}\NormalTok{ population,}
+\NormalTok{  )}
+
+\CommentTok{\# Update Continent and Subcontinent for Kosovo}
+\NormalTok{cia\_data\_tibble }\OtherTok{\textless{}{-}}\NormalTok{ cia\_data\_tibble }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{Continent =} \FunctionTok{if\_else}\NormalTok{(Country }\SpecialCharTok{==} \StringTok{"Kosovo"}\NormalTok{, }\StringTok{"Europe"}\NormalTok{, Continent),}
+    \AttributeTok{Subcontinent =} \FunctionTok{if\_else}\NormalTok{(Country }\SpecialCharTok{==} \StringTok{"Kosovo"}\NormalTok{, }\StringTok{"Balkan Peninsula"}\NormalTok{, Subcontinent)}
+\NormalTok{  )}
+
+\CommentTok{\# Load natural earth data for countries}
+\NormalTok{world }\OtherTok{\textless{}{-}} \FunctionTok{ne\_countries}\NormalTok{(}\AttributeTok{scale =} \StringTok{"medium"}\NormalTok{, }\AttributeTok{returnclass =} \StringTok{"sf"}\NormalTok{)}
+
+\CommentTok{\# Merge your data with the world data}
+\NormalTok{world\_data }\OtherTok{\textless{}{-}}\NormalTok{ world }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{left\_join}\NormalTok{(cia\_data\_tibble, }\AttributeTok{by =} \FunctionTok{c}\NormalTok{(}\StringTok{"iso\_a3"} \OtherTok{=} \StringTok{"ISO3"}\NormalTok{))}
+
+
+\FunctionTok{glimpse}\NormalTok{(cia\_data\_tibble)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Rows: 227
+## Columns: 13
+## $ Country                      <chr> "Afghanistan", "Albania", "Algeria", "Ame~
+## $ ISO3                         <chr> "AFG", "ALB", "DZA", "ASM", "AND", "AGO",~
+## $ Continent                    <chr> "Asia", "Europe", "Africa", "Oceania", "E~
+## $ Subcontinent                 <chr> "Southern Asia", "Southern Europe", "Nort~
+## $ Status                       <chr> "L", "UM", "LM", "UM", "H", "LM", NA, "H"~
+## $ Median_age                   <dbl> 19.5, 34.3, 28.9, 27.2, 46.2, 15.9, 35.7,~
+## $ Youth_unemployment_rate      <dbl> 17.6, 31.9, 39.3, NA, NA, 39.4, NA, NA, 2~
+## $ Net_migration_rate           <dbl> -0.1, -3.3, -0.9, -26.1, 0.0, -0.2, 11.1,~
+## $ Electricity_from_fossil_fuel <int> 45, 5, 96, 98, 61, 34, NA, 97, 69, 58, 87~
+## $ Area                         <int> 652230, 28748, 2381740, 224, 468, 1246700~
+## $ Population_growth_rate       <dbl> 2.38, 0.28, 1.52, -1.40, -0.06, 3.43, 1.8~
+## $ Life_expectancy              <dbl> 52.8, 79.0, 77.5, 74.8, 83.0, 61.3, 81.8,~
+## $ Population                   <chr> "36,643,815", "3,074,579", "42,972,878", ~
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Define UI}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{ui }\OtherTok{\textless{}{-}} \FunctionTok{fluidPage}\NormalTok{(}
+  \FunctionTok{tabsetPanel}\NormalTok{(}
+    \FunctionTok{tabPanel}\NormalTok{(}\StringTok{"Univariate analysis"}\NormalTok{,}
+      \FunctionTok{sidebarLayout}\NormalTok{(}
+        \FunctionTok{sidebarPanel}\NormalTok{(}
+          \FunctionTok{fluidRow}\NormalTok{(}
+            \FunctionTok{box}\NormalTok{(}
+              \FunctionTok{selectInput}\NormalTok{(}\StringTok{"variable"}\NormalTok{, }\StringTok{"Select a variable:"}\NormalTok{,}
+                         \AttributeTok{choices =} \FunctionTok{c}\NormalTok{(}\StringTok{"Median age"}                   \OtherTok{=} \StringTok{"Median\_age"}\NormalTok{,}
+                                     \StringTok{"Youth unemployment rate"}      \OtherTok{=} \StringTok{"Youth\_unemployment\_rate"}\NormalTok{,}
+                                     \StringTok{"Net migration rate"}           \OtherTok{=} \StringTok{"Net\_migration\_rate"}\NormalTok{,}
+                                     \StringTok{"Population growth rate"}       \OtherTok{=} \StringTok{"Population\_growth\_rate"}\NormalTok{,}
+                                     \StringTok{"Electricity from fossil fuel"} \OtherTok{=} \StringTok{"Electricity\_from\_fossil\_fuel"}\NormalTok{,}
+                                     \StringTok{"Life expectancy"}              \OtherTok{=} \StringTok{"Life\_expectancy"}\NormalTok{)),}
+              \FunctionTok{actionButton}\NormalTok{(}\StringTok{"viewData"}\NormalTok{, }\StringTok{"View Raw Data"}\NormalTok{),}
+              \FunctionTok{DTOutput}\NormalTok{(}\StringTok{"dataTable"}\NormalTok{)}
+\NormalTok{            )}
+\NormalTok{          ),}
+\NormalTok{        ),}
+        \FunctionTok{mainPanel}\NormalTok{(}
+          \FunctionTok{tabsetPanel}\NormalTok{(}
+            \FunctionTok{tabPanel}\NormalTok{(}\StringTok{"Map"}\NormalTok{,}
+               \FunctionTok{helpText}\NormalTok{(}\StringTok{"The map contains values of the selected variables. }
+\StringTok{                        The countries with gray areas have a missing value }
+\StringTok{                        for the visualized variable."}\NormalTok{),}
+               \FunctionTok{plotlyOutput}\NormalTok{(}\StringTok{"worldMap"}\NormalTok{)}
+\NormalTok{            ),}
+            \FunctionTok{tabPanel}\NormalTok{(}\StringTok{"Boxplot (overall)"}\NormalTok{,}
+              \FunctionTok{plotlyOutput}\NormalTok{(}\StringTok{"overallBoxplot"}\NormalTok{)}
+\NormalTok{            ),}
+            \FunctionTok{tabPanel}\NormalTok{(}\StringTok{"Boxplot per continent"}\NormalTok{,}
+              \FunctionTok{plotlyOutput}\NormalTok{(}\StringTok{"continentBoxplot"}\NormalTok{)}
+\NormalTok{            )}
+\NormalTok{          )}
+\NormalTok{        )}
+\NormalTok{      )}
+\NormalTok{    ),}
+    \FunctionTok{tabPanel}\NormalTok{(}\StringTok{"Multivariate analysis"}\NormalTok{,}
+      \FunctionTok{sidebarLayout}\NormalTok{(}
+        \FunctionTok{sidebarPanel}\NormalTok{(}
+          \FunctionTok{fluidRow}\NormalTok{(}
+            \FunctionTok{box}\NormalTok{(}
+              \FunctionTok{selectInput}\NormalTok{(}\StringTok{"variable1"}\NormalTok{, }\StringTok{"Select a variable 1:"}\NormalTok{,}
+                         \AttributeTok{choices =} \FunctionTok{c}\NormalTok{(}\StringTok{"Median age"}                   \OtherTok{=} \StringTok{"Median\_age"}\NormalTok{,}
+                                     \StringTok{"Youth unemployment rate"}      \OtherTok{=} \StringTok{"Youth\_unemployment\_rate"}\NormalTok{,}
+                                     \StringTok{"Net migration rate"}           \OtherTok{=} \StringTok{"Net\_migration\_rate"}\NormalTok{,}
+                                     \StringTok{"Population growth rate"}       \OtherTok{=} \StringTok{"Population\_growth\_rate"}\NormalTok{,}
+                                     \StringTok{"Electricity from fossil fuel"} \OtherTok{=} \StringTok{"Electricity\_from\_fossil\_fuel"}\NormalTok{,}
+                                     \StringTok{"Life expectancy"}              \OtherTok{=} \StringTok{"Life\_expectancy"}\NormalTok{)),}
+              \FunctionTok{selectInput}\NormalTok{(}\StringTok{"variable2"}\NormalTok{, }\StringTok{"Select a variable 2:"}\NormalTok{,}
+                         \AttributeTok{choices =} \FunctionTok{c}\NormalTok{(}\StringTok{"Median age"}                   \OtherTok{=} \StringTok{"Median\_age"}\NormalTok{,}
+                                     \StringTok{"Youth unemployment rate"}      \OtherTok{=} \StringTok{"Youth\_unemployment\_rate"}\NormalTok{,}
+                                     \StringTok{"Net migration rate"}           \OtherTok{=} \StringTok{"Net\_migration\_rate"}\NormalTok{,}
+                                     \StringTok{"Population growth rate"}       \OtherTok{=} \StringTok{"Population\_growth\_rate"}\NormalTok{,}
+                                     \StringTok{"Electricity from fossil fuel"} \OtherTok{=} \StringTok{"Electricity\_from\_fossil\_fuel"}\NormalTok{,}
+                                     \StringTok{"Life expectancy"}              \OtherTok{=} \StringTok{"Life\_expectancy"}\NormalTok{)),}
+              \FunctionTok{selectInput}\NormalTok{(}\StringTok{"scaleBy"}\NormalTok{, }\StringTok{"Scale points by:"}\NormalTok{,}
+                          \AttributeTok{choices =} \FunctionTok{c}\NormalTok{(}\StringTok{"area"} \OtherTok{=} \StringTok{"Area"}\NormalTok{,}
+                                      \StringTok{"population"} \OtherTok{=} \StringTok{"Population"}\NormalTok{)),}
+              \FunctionTok{actionButton}\NormalTok{(}\StringTok{"viewData"}\NormalTok{, }\StringTok{"View Raw Data"}\NormalTok{),}
+              \FunctionTok{DTOutput}\NormalTok{(}\StringTok{"dataTable"}\NormalTok{)}
+\NormalTok{            )}
+\NormalTok{          ),}
+\NormalTok{        ),}
+        \FunctionTok{mainPanel}\NormalTok{(}
+          \FunctionTok{plotlyOutput}\NormalTok{(}\StringTok{"scatterPlot"}\NormalTok{)}
+\NormalTok{        )}
+\NormalTok{      )}
+\NormalTok{    )}
+\NormalTok{  )}
+\NormalTok{)}
+
+
+\CommentTok{\# Define Server}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{server }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(input, output, session) \{}
+  
+  \CommentTok{\# }\AlertTok{TODO}\CommentTok{: uncomment after testing}
+  \CommentTok{\# shinyalert(title = "Welcome", }
+  \CommentTok{\#            text = "This app allows you to visualize various plots from the cia database", }
+  \CommentTok{\#            type = "info", }
+  \CommentTok{\#            closeOnClickOutside = TRUE}
+  \CommentTok{\# )}
+  
+  \CommentTok{\# Render the basic data table}
+\NormalTok{  output}\SpecialCharTok{$}\NormalTok{dataTable }\OtherTok{\textless{}{-}} \FunctionTok{renderDT}\NormalTok{(\{}
+    \FunctionTok{req}\NormalTok{(input}\SpecialCharTok{$}\NormalTok{viewData)}
+    \FunctionTok{isolate}\NormalTok{(\{}
+      \FunctionTok{datatable}\NormalTok{(cia\_data\_tibble[, }\FunctionTok{c}\NormalTok{(}\StringTok{"Country"}\NormalTok{, }\StringTok{"Continent"}\NormalTok{, input}\SpecialCharTok{$}\NormalTok{variable)], }
+                \AttributeTok{options =} \FunctionTok{list}\NormalTok{(}\AttributeTok{pageLength =} \DecValTok{15}\NormalTok{))}
+\NormalTok{    \})}
+\NormalTok{  \}, }\AttributeTok{server =} \ConstantTok{FALSE}\NormalTok{)}
+  
+  \CommentTok{\# Render world map}
+\NormalTok{  output}\SpecialCharTok{$}\NormalTok{worldMap }\OtherTok{\textless{}{-}} \FunctionTok{renderPlotly}\NormalTok{(\{}
+    \FunctionTok{req}\NormalTok{(input}\SpecialCharTok{$}\NormalTok{variable) }\CommentTok{\# Ensure a variable is selected}
+\NormalTok{    world }\OtherTok{\textless{}{-}} \FunctionTok{ne\_countries}\NormalTok{(}\AttributeTok{scale =} \StringTok{"medium"}\NormalTok{, }\AttributeTok{returnclass =} \StringTok{"sf"}\NormalTok{)}
+    
+    \CommentTok{\# Prepare the column name to include in the aes\_string}
+\NormalTok{    variable\_name }\OtherTok{\textless{}{-}} \FunctionTok{sprintf}\NormalTok{(}\StringTok{"\textasciigrave{}\%s\textasciigrave{}"}\NormalTok{, input}\SpecialCharTok{$}\NormalTok{variable)}
+    
+\NormalTok{    world\_data }\OtherTok{\textless{}{-}} \FunctionTok{left\_join}\NormalTok{(world, cia\_data\_tibble, }\AttributeTok{by =} \FunctionTok{c}\NormalTok{(}\StringTok{"iso\_a3"} \OtherTok{=} \StringTok{"ISO3"}\NormalTok{))}
+    
+    \CommentTok{\# Create the ggplot object}
+\NormalTok{    p }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ world\_data) }\SpecialCharTok{+}
+     \FunctionTok{geom\_sf}\NormalTok{(}\FunctionTok{aes\_string}\NormalTok{(}\AttributeTok{fill =}\NormalTok{ variable\_name, }
+                        \AttributeTok{geometry =} \StringTok{"geometry"}\NormalTok{,}
+                        \AttributeTok{group =} \DecValTok{1}\NormalTok{,}
+                        \AttributeTok{text =} \FunctionTok{sprintf}\NormalTok{(}\StringTok{"paste(iso\_a3, \textquotesingle{}: \textquotesingle{}, \%s)"}\NormalTok{, variable\_name)}
+\NormalTok{                       ), }
+             \AttributeTok{color =} \StringTok{"white"}\NormalTok{) }\SpecialCharTok{+}
+     \FunctionTok{scale\_fill\_viridis\_c}\NormalTok{(}\AttributeTok{option =} \StringTok{"viridis"}\NormalTok{, }\AttributeTok{name =}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{variable) }\SpecialCharTok{+}
+     \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+     \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"bottom"}\NormalTok{)}
+    
+    \CommentTok{\# Convert to plotly for interactivity}
+    \FunctionTok{ggplotly}\NormalTok{(p, }\AttributeTok{tooltip =} \FunctionTok{c}\NormalTok{(}\StringTok{"text"}\NormalTok{))}
+\NormalTok{  \})}
+  
+  \CommentTok{\# Render Overall Boxplot}
+\NormalTok{  output}\SpecialCharTok{$}\NormalTok{overallBoxplot }\OtherTok{\textless{}{-}} \FunctionTok{renderPlotly}\NormalTok{(\{}
+    \FunctionTok{req}\NormalTok{(input}\SpecialCharTok{$}\NormalTok{variable)  }\CommentTok{\# Ensure a variable is selected}
+    
+    \CommentTok{\# Prepare the column name to include in the aes\_string}
+\NormalTok{    variable\_name }\OtherTok{\textless{}{-}} \FunctionTok{sprintf}\NormalTok{(}\StringTok{"\textasciigrave{}\%s\textasciigrave{}"}\NormalTok{, input}\SpecialCharTok{$}\NormalTok{variable)}
+  
+    \CommentTok{\# Creating the boxplot using ggplot}
+\NormalTok{    p }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(cia\_data\_tibble, }\FunctionTok{aes\_string}\NormalTok{(}\AttributeTok{y =}\NormalTok{ variable\_name)) }\SpecialCharTok{+}
+      \FunctionTok{geom\_boxplot}\NormalTok{() }\SpecialCharTok{+}
+      \FunctionTok{labs}\NormalTok{(}\AttributeTok{y =}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{variable) }\SpecialCharTok{+}
+      \FunctionTok{theme\_minimal}\NormalTok{()}
+    
+    \CommentTok{\# Convert to Plotly for interactivity}
+    \FunctionTok{ggplotly}\NormalTok{(p)}
+\NormalTok{  \})}
+  
+  \CommentTok{\# Render Boxplot per Continent}
+\NormalTok{  output}\SpecialCharTok{$}\NormalTok{continentBoxplot }\OtherTok{\textless{}{-}} \FunctionTok{renderPlotly}\NormalTok{(\{}
+    \FunctionTok{req}\NormalTok{(input}\SpecialCharTok{$}\NormalTok{variable)  }\CommentTok{\# Ensure a variable is selected}
+    \CommentTok{\# Prepare the column name to include in the aes\_string}
+\NormalTok{    variable\_name }\OtherTok{\textless{}{-}} \FunctionTok{sprintf}\NormalTok{(}\StringTok{"\textasciigrave{}\%s\textasciigrave{}"}\NormalTok{, input}\SpecialCharTok{$}\NormalTok{variable)}
+  
+    \CommentTok{\# Creating the boxplot using ggplot grouped by continent}
+\NormalTok{    p }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(cia\_data\_tibble, }\FunctionTok{aes\_string}\NormalTok{(}\AttributeTok{x =} \StringTok{"Continent"}\NormalTok{, }\AttributeTok{y =}\NormalTok{ variable\_name, }\AttributeTok{fill =} \StringTok{"Continent"}\NormalTok{)) }\SpecialCharTok{+}
+      \FunctionTok{geom\_boxplot}\NormalTok{() }\SpecialCharTok{+}
+      \FunctionTok{labs}\NormalTok{(}\AttributeTok{y =}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{variable) }\SpecialCharTok{+}
+      \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+      \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{)}
+    
+    \CommentTok{\# Convert to Plotly for interactivity}
+    \FunctionTok{ggplotly}\NormalTok{(p)}
+\NormalTok{  \})}
+  
+  \CommentTok{\# Renderscatterplot of selected variables}
+\NormalTok{  output}\SpecialCharTok{$}\NormalTok{scatterPlot }\OtherTok{\textless{}{-}} \FunctionTok{renderPlotly}\NormalTok{(\{}
+    \FunctionTok{req}\NormalTok{(input}\SpecialCharTok{$}\NormalTok{variable1, input}\SpecialCharTok{$}\NormalTok{variable2, input}\SpecialCharTok{$}\NormalTok{scaleBy)  }\CommentTok{\# Ensure that the variables are selected}
+    \CommentTok{\# Prepare the column names to include in the aes\_string}
+\NormalTok{    var1\_name }\OtherTok{\textless{}{-}} \FunctionTok{sprintf}\NormalTok{(}\StringTok{"\textasciigrave{}\%s\textasciigrave{}"}\NormalTok{, input}\SpecialCharTok{$}\NormalTok{variable1)}
+\NormalTok{    var2\_name }\OtherTok{\textless{}{-}} \FunctionTok{sprintf}\NormalTok{(}\StringTok{"\textasciigrave{}\%s\textasciigrave{}"}\NormalTok{, input}\SpecialCharTok{$}\NormalTok{variable2)}
+    
+    \CommentTok{\# Create the scatterplot using ggplot}
+\NormalTok{    p }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(cia\_data\_tibble) }\SpecialCharTok{+} \FunctionTok{aes\_string}\NormalTok{(}\AttributeTok{x=}\NormalTok{input}\SpecialCharTok{$}\NormalTok{variable1, }\AttributeTok{y=}\NormalTok{input}\SpecialCharTok{$}\NormalTok{variable2, }\AttributeTok{size=}\NormalTok{input}\SpecialCharTok{$}\NormalTok{scaleBy, }\AttributeTok{alpha=}\FloatTok{0.7}\NormalTok{, }\AttributeTok{color=}\StringTok{"Continent"}\NormalTok{, }\AttributeTok{text=}\StringTok{"Country"}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} \FunctionTok{ggtitle}\NormalTok{(}\FunctionTok{c}\NormalTok{(var1\_name, }\StringTok{" vs. "}\NormalTok{, var2\_name))}
+    \FunctionTok{ggplotly}\NormalTok{(p, }\AttributeTok{tooltip=}\FunctionTok{c}\NormalTok{(}\StringTok{"text"}\NormalTok{, }\StringTok{"x"}\NormalTok{, }\StringTok{"y"}\NormalTok{, }\StringTok{"size"}\NormalTok{))}
+\NormalTok{  \})}
+
+\NormalTok{\}}
+
+\CommentTok{\# Run the application}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\FunctionTok{shinyApp}\NormalTok{(}\AttributeTok{ui =}\NormalTok{ ui, }\AttributeTok{server =}\NormalTok{ server)}
+\end{Highlighting}
+\end{Shaded}
+
+
+\end{document}

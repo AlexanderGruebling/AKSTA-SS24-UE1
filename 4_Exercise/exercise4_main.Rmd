@@ -125,7 +125,37 @@ ui <- fluidPage(
         )
       )
     ),
-    tabPanel("Multivariate analysis")
+    tabPanel("Multivariate analysis",
+      sidebarLayout(
+        sidebarPanel(
+          fluidRow(
+            box(
+              selectInput("variable1", "Select a variable 1:",
+                         choices = c("Median age"                   = "Median_age",
+                                     "Youth unemployment rate"      = "Youth_unemployment_rate",
+                                     "Net migration rate"           = "Net_migration_rate",
+                                     "Population growth rate"       = "Population_growth_rate",
+                                     "Electricity from fossil fuel" = "Electricity_from_fossil_fuel",
+                                     "Life expectancy"              = "Life_expectancy")),
+              selectInput("variable2", "Select a variable 2:",
+                         choices = c("Median age"                   = "Median_age",
+                                     "Youth unemployment rate"      = "Youth_unemployment_rate",
+                                     "Net migration rate"           = "Net_migration_rate",
+                                     "Population growth rate"       = "Population_growth_rate",
+                                     "Electricity from fossil fuel" = "Electricity_from_fossil_fuel",
+                                     "Life expectancy"              = "Life_expectancy")),
+              selectInput("scaleBy", "Scale points by:",
+                          choices = c("Area" = "Area",
+                                      "Population" = "Population")),
+              DTOutput("dataTable")
+            )
+          ),
+        ),
+        mainPanel(
+          plotlyOutput("scatterPlot")
+        )
+      )
+    )
   )
 )
 
@@ -208,6 +238,15 @@ server <- function(input, output, session) {
     
     # Convert to Plotly for interactivity
     ggplotly(p)
+  })
+  
+  # Renderscatterplot of selected variables
+  output$scatterPlot <- renderPlotly({
+    req(input$variable1, input$variable2, input$scaleBy)  # Ensure that the variables are selected
+    
+    # Create the scatterplot using ggplot
+    p <- ggplot(cia_data_tibble) + aes_string(x=input$variable1, y=input$variable2, color="Continent", size=input$scaleBy, text="Country") + geom_point(alpha=0.7) + ggtitle(paste(input$variable, "vs.", input$variable2, "scaled by", input$scaleBy))
+    ggplotly(p, tooltip=c("text", "x", "y", "size"))
   })
 
 }
